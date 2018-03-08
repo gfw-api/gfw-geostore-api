@@ -4,6 +4,7 @@ var Router = require('koa-router');
 var logger = require('logger');
 var GeoStoreValidator = require('validators/geoStoreValidator');
 var GeoJSONSerializer = require('serializers/geoJSONSerializer');
+var AreaSerializer = require('serializers/areaSerializer');
 var CountryListSerializer = require('serializers/countryListSerializer');
 var GeoStore = require('models/geoStore');
 var IdConnection = require('models/idConnection');
@@ -68,6 +69,33 @@ class GeoStoreRouter {
           let geostore = yield GeoStoreService.saveGeostore(this.request.body.geojson, data);
           logger.debug(JSON.stringify(geostore.geojson));
           this.body = GeoJSONSerializer.serialize(geostore);
+        } catch(err){
+            if (err instanceof ProviderNotFound || err instanceof GeoJSONNotFound){
+                this.throw(400, err.message);
+                return ;
+            }
+            throw err;
+        }
+    }
+
+    static * getArea() {
+        logger.info('Retreiving Polygon Area');
+        try{
+          const data = {
+            provider: this.request.body.provider,
+            info: {},
+            lock: this.request.body.lock ? this.request.body.lock : false
+          };
+          if (!this.request.body.geojson && !this.request.body.esrijson && !this.request.body.provider){
+            this.throw(400, 'geojson, esrijson or provider required');
+            return;
+          }
+          if (this.request.body.esrijson){
+            this.request.body.geojson = arcgisToGeoJSON(this.request.body.esrijson);
+          }
+          let geostore = yield GeoStoreService.calculateArea(this.request.body.geojson, data);
+          logger.debug(JSON.stringify(geostore.geojson));
+          this.body = AreaSerializer.serialize(geostore);
         } catch(err){
             if (err instanceof ProviderNotFound || err instanceof GeoJSONNotFound){
                 this.throw(400, err.message);
@@ -179,6 +207,7 @@ class GeoStoreRouter {
 
 router.get('/:hash', GeoStoreRouter.getGeoStoreById);
 router.post('/', GeoStoreValidator.create, GeoStoreRouter.createGeoStore);
+router.post('/area', GeoStoreValidator.create, GeoStoreRouter.getArea);
 router.get('/admin/:iso', GeoStoreRouter.getNational);
 router.get('/admin/list', GeoStoreRouter.getNationalList);
 router.get('/admin/:iso/:id1', GeoStoreRouter.getSubnational);

@@ -12,6 +12,13 @@
             "path": "/api/v1/geostore"
         }]
     }, {
+        "url": "/v1/geostore/area",
+        "method": "POST",
+        "endpoints": [{
+            "method": "POST",
+            "path": "/api/v1/geostore/area"
+        }]
+    },{
         "url": "/v1/geostore/:id",
         "method": "GET",
         "endpoints": [{
