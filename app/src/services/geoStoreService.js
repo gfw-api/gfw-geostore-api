@@ -178,12 +178,9 @@ class GeoStoreService {
         logger.debug('Converting', JSON.stringify(geoStore.geojson));
         geoStore.geojson = GeoJSONConverter.convert(geoStore.geojson);
         logger.debug('Result', JSON.stringify(geoStore.geojson));
-        if (geoStore.areaHa === undefined) {
-            geoStore.areaHa = turf.area(geoStore.geojson) / 10000; // convert to ha2
-        }
-        if(!geoStore.bbox) {
-            geoStore.bbox = turf.bbox(geoStore.geojson);
-        }
+        geoStore.areaHa = turf.area(geoStore.geojson) / 10000; // convert to ha2
+        geoStore.bbox = turf.bbox(geoStore.geojson);
+
         return yield geoStore
 
     }
