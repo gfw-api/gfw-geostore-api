@@ -168,9 +168,7 @@ class GeoStoreService {
             geoStore.bbox = turf.bbox(geoStore.geojson);
         }
 
-
         yield GeoStore.findOneAndUpdate({hash: geoStore.hash}, geoStore, {upsert: true, new: true, runValidators: true});
-
         
         return yield GeoStore.findOne({
             hash: geoStore.hash

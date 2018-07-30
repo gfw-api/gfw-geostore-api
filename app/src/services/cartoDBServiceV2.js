@@ -7,7 +7,7 @@ var Mustache = require('mustache');
 var JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
 const GeoStoreServiceV2 = require('services/geoStoreServiceV2');
 
-const ISO = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha, name_0 as name
+const ISO = `SELECT ST_AsGeoJSON(st_makevalid({geom})) AS geojson, (ST_Area(geography({geom}))/10000) as area_ha, name_0 as name
         FROM gadm36_adm0
         WHERE gid_0 = UPPER('{{iso}}')`;
 
@@ -15,11 +15,11 @@ const ISO_NAME = `SELECT gid_0, name_0 as name
         FROM gadm36_adm0
         WHERE gid_0 in `;
 
-const ID1 = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+const ID1 = `SELECT ST_AsGeoJSON(st_makevalid({geom})) AS geojson, (ST_Area(geography({geom}))/10000) as area_ha, name_1 as name
         FROM gadm36_adm1
         WHERE gid_1 = '{{id1}}'`;
 
-const ID2 = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+const ID2 = `SELECT ST_AsGeoJSON(st_makevalid({geom})) AS geojson, (ST_Area(geography({geom}))/10000) as area_ha, name_2 as name
         FROM gadm36_adm2
         WHERE gid_2 = '{{id2}}'`;
 
@@ -39,9 +39,11 @@ const USE = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(ge
         FROM {{use}}
         WHERE cartodb_id = {{id}}`;
 
-const executeThunk = function(client, sql, params) {
+const executeThunk = function(client, sql, params, thresh) {
     return function(callback) {
-        logger.debug(Mustache.render(sql, params));
+        sql = sql.replace('{geom}', thresh ? `ST_Simplify(the_geom, ${thresh})` : 'the_geom')
+                 .replace('{geom}', thresh ? `ST_Simplify(the_geom, ${thresh})` : 'the_geom');
+        logger.debug(Mustache.render(sql, params, thresh));
         client.execute(sql, params).done(function(data) {
             callback(null, data);
         }).error(function(err) {
@@ -65,32 +67,31 @@ class CartoDBServiceV2 {
         });
     }
 
-    * getNational(iso) {
+    * getNational(iso, thresh) {
         logger.debug('Obtaining national of iso %s', iso);
-        let query = {
-            'info.iso': iso.toUpperCase(),
-            'info.id1': null
+        let params = {
+            'iso': iso.toUpperCase()
         };
         logger.debug('Checking existing national geo');
-        let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfoProps(query);
+        let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfoProps(params);
         logger.debug('Existed geo', existingGeo);
-        if (existingGeo) {
+        if (existingGeo && !thresh) {
           logger.debug('Return national geojson stored');
           return existingGeo;
         }
 
         logger.debug('Request national to carto');
-        let data = yield executeThunk(this.client, ISO, {iso: iso.toUpperCase()});
+        let data = yield executeThunk(this.client, ISO, params, thresh);
         if (data.rows && data.rows.length > 0) {
           let result = data.rows[0];
           logger.debug('Saving national geostore');
           const geoData = {
             info : {
-                'iso': iso.toUpperCase(),
+                iso: iso.toUpperCase(),
+                name: result.name,
                 gadm: '3.6'
             }
           };
-          geoData.info.name = result.name;
           existingGeo = yield GeoStoreServiceV2.saveGeostore(JSON.parse(result.geojson), geoData);
           logger.debug('Return national geojson from carto');
           return existingGeo;
@@ -126,22 +127,21 @@ class CartoDBServiceV2 {
         return countryList;
     }
 
-    * getSubnational(iso, id1) {
+    * getSubnational(iso, id1, thresh) {
       logger.debug('Obtaining subnational of iso %s and id1', iso, id1);
       let params = {
         id1: `${iso.toUpperCase()}.${parseInt(id1, 10)}_1`
       };
-
       logger.debug('Checking existing subnational geo');
-      let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfo(params);
+      let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfo({iso, id1});
       logger.debug('Existed geo', existingGeo);
-      if (existingGeo) {
+      if (existingGeo && !thresh) {
         logger.debug('Return subnational geojson stored');
         return existingGeo;
       }
-
+   
+      let data = yield executeThunk(this.client, ID1, params, thresh);
       logger.debug('Request subnational to carto');
-      let data = yield executeThunk(this.client, ID1, params);
       if (data.rows && data.rows.length > 0) {
         logger.debug('Return subnational geojson from carto');
         let result = data.rows[0];
@@ -149,6 +149,7 @@ class CartoDBServiceV2 {
         const geoData = {
           info: {
               iso: iso.toUpperCase(),
+              name: result.name,
               id1: parseInt(id1, 10),
               gadm: '3.6'
           }
@@ -159,22 +160,22 @@ class CartoDBServiceV2 {
       return null;
     }
 
-    * getAdmin2(iso, id1, id2) {
+    * getAdmin2(iso, id1, id2, thresh) {
       logger.debug('Obtaining admin2 of iso %s, id1 and id2', iso, id1, id2);
       let params = {
         id2: `${iso.toUpperCase()}.${parseInt(id1, 10)}.${parseInt(id2, 10)}_1`
       };
 
       logger.debug('Checking existing admin2 geostore');
-      let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfo(params);
+      let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfo({iso, id1, id2});
       logger.debug('Existed geo', existingGeo);
-      if (existingGeo) {
+      if (existingGeo && !thresh) {
         logger.debug('Return admin2 geojson stored');
         return existingGeo;
       }
 
       logger.debug('Request admin2 shape from Carto');
-      let data = yield executeThunk(this.client, ID2, params);
+      let data = yield executeThunk(this.client, ID2, params, thresh);
       if (data.rows && data.rows.length > 0) {
         logger.debug('Return admin2 geojson from Carto');
         let result = data.rows[0];
@@ -184,6 +185,7 @@ class CartoDBServiceV2 {
                 iso: iso.toUpperCase(),
                 id1: parseInt(id1, 10),
                 id2: parseInt(id2, 10),
+                name: result.name,
                 gadm: '3.6'
             }
         };

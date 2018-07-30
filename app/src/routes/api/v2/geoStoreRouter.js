@@ -107,7 +107,11 @@ class GeoStoreRouterV2 {
 
     static * getNational() {
         logger.info('Obtaining national data geojson (GADM v3.6)');
-        const data = yield CartoServiceV2.getNational(this.params.iso);
+        const thresh = parseFloat(this.query.simplify) || null;
+        if(thresh && (thresh > 1 || thresh <= 0)) {
+            this.throw(404, 'Bad threshold for simplify');
+        }
+        const data = yield CartoServiceV2.getNational(this.params.iso, thresh);
         if (!data) {
           this.throw(404, 'Country not found');
         }
@@ -125,16 +129,24 @@ class GeoStoreRouterV2 {
 
     static * getSubnational() {
         logger.info('Obtaining subnational data geojson (GADM v3.6)');
-        const data = yield CartoServiceV2.getSubnational(this.params.iso, this.params.id1);
+        const thresh = parseFloat(this.query.simplify) || null;
+        if(thresh && (thresh > 1 || thresh <= 0)) {
+            this.throw(404, 'Bad threshold for simplify');
+        }
+        const data = yield CartoServiceV2.getSubnational(this.params.iso, this.params.id1, thresh);
         if (!data) {
-          this.throw(404, 'Country/Region not found');
+          
         }
         this.body = GeoJSONSerializer.serialize(data);
     }
 
     static * getAdmin2() {
         logger.info('Obtaining Admin2 data geojson (GADM v3.6)');
-        const data = yield CartoServiceV2.getAdmin2(this.params.iso, this.params.id1, this.params.id2);
+        const thresh = parseFloat(this.query.simplify) || null;
+        if(thresh && (thresh > 1 || thresh <= 0)) {
+            this.throw(404, 'Bad threshold for simplify');
+        }
+        const data = yield CartoServiceV2.getAdmin2(this.params.iso, this.params.id1, this.params.id2, thresh);
         if (!data) {
           this.throw(404, 'Country/Admin1/Admin2 not found');
         }
