@@ -68,21 +68,21 @@ var onDbReady = function (err) {
   var port = process.env.PORT || config.get('service.port');
 
   server.listen(port, function () {
-    ctRegisterMicroservice.register({
-      info: require('../microservice/register.json'),
-      swagger: require('../microservice/public-swagger.json'),
-      mode: (process.env.CT_REGISTER_MODE && process.env.CT_REGISTER_MODE === 'auto') ? ctRegisterMicroservice.MODE_AUTOREGISTER : ctRegisterMicroservice.MODE_NORMAL,
-      framework: ctRegisterMicroservice.KOA1,
-      app,
-      logger,
-      name: config.get('service.name'),
-      ctUrl: process.env.CT_URL,
-      url: process.env.LOCAL_URL,
-      active: true,
-    }).then(() => {}, (err) => {
-      logger.error(err);
-      process.exit(1);
-    });
+  //   ctRegisterMicroservice.register({
+  //     info: require('../microservice/register.json'),
+  //     swagger: require('../microservice/public-swagger.json'),
+  //     mode: (process.env.CT_REGISTER_MODE && process.env.CT_REGISTER_MODE === 'auto') ? ctRegisterMicroservice.MODE_AUTOREGISTER : ctRegisterMicroservice.MODE_NORMAL,
+  //     framework: ctRegisterMicroservice.KOA1,
+  //     app,
+  //     logger,
+  //     name: config.get('service.name'),
+  //     ctUrl: process.env.CT_URL,
+  //     url: process.env.LOCAL_URL,
+  //     active: true,
+  //   }).then(() => {}, (err) => {
+  //     logger.error(err);
+  //     process.exit(1);
+  //   });
   });
 
   logger.info('Server started in port:' + port);

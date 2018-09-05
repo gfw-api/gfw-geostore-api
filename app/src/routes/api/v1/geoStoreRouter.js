@@ -157,8 +157,14 @@ class GeoStoreRouter {
             case 'logging':
                 useTable = 'gfw_logging';
                 break;
+            case 'endemic_bird_areas':
+                useTable = 'endemic_bird_areas';
+                break;
+            case 'tiger_conservation_landscapes':
+                useTable = 'tcl';
+                break;
             default:
-                this.throw(400, 'Name param invalid');
+                useTable = this.params.name;
         }
         if (!useTable) {
             this.throw(404, 'Name not found');
