@@ -43,7 +43,7 @@ const SIMPLIFIED_USE =
         `SELECT ST_Area(geography(the_geom))/10000 as area_ha, the_geom,
         CASE
             WHEN area_ha::numeric > 1e8 
-            THEN st_asgeojson(st_makevalid(st_simplify(the_geom, 0.05)))
+            THEN st_asgeojson(st_makevalid(st_simplify(the_geom, 0.1)))
             WHEN area_ha::numeric > 1e6 
             THEN st_asgeojson(st_makevalid(st_simplify(the_geom, 0.005)))
             ELSE st_asgeojson(st_makevalid(the_geom))
@@ -72,12 +72,12 @@ const deserializer = function(obj) {
 
 var parseSimplifyGeom = function(iso, id1, id2) {
     const bigCountries = ['USA', 'RUS', 'CAN', 'CHN', 'BRA', 'IDN'];
-    let baseThresh = bigCountries.includes(iso) ? 0.05 : 0.005;
+    let baseThresh = bigCountries.includes(iso) ? 0.1 : 0.005;
     if(iso && !id1 && !id2){
         return baseThresh;
     }
     else {
-        return id1 && !id2 ? baseThresh / 100 : baseThresh / 100;
+        return id1 && !id2 ? baseThresh / 10 : baseThresh / 100;
     }
   };
 

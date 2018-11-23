@@ -112,7 +112,7 @@ class GeoStoreRouterV2 {
         if(thresh && typeof thresh === Number && (thresh > 1 || thresh <= 0)){
                 this.throw(404, 'Bad threshold for simplify. Must be in range 0-1.');
         }
-        else if (thresh && typeof thresh === Boolean && thresh !== true) {
+        else if (thresh && typeof thresh === Boolean && thresh.toLowerCase() !== true) {
             this.throw(404, 'Bad syntax for simplify. Must be "true".');
         }
         const data = yield CartoServiceV2.getNational(this.params.iso, thresh);
@@ -138,7 +138,7 @@ class GeoStoreRouterV2 {
         if(thresh && typeof thresh === Number && (thresh > 1 || thresh <= 0)){
                 this.throw(404, 'Bad threshold for simplify. Must be in range 0-1.');
         }
-        else if (thresh && typeof thresh === Boolean && thresh !== true) {
+        else if (thresh && typeof thresh === Boolean && thresh.toLowerCase() !== true) {
             this.throw(404, 'Bad syntax for simplify. Must be "true".');
         }
         const data = yield CartoServiceV2.getSubnational(this.params.iso, this.params.id1, thresh);
@@ -155,7 +155,7 @@ class GeoStoreRouterV2 {
         if(thresh && typeof thresh === Number && (thresh > 1 || thresh <= 0)){
                 this.throw(404, 'Bad threshold for simplify. Must be in range 0-1.');
         }
-        else if (thresh && typeof thresh === Boolean && thresh !== true) {
+        else if (thresh && typeof thresh === Boolean && thresh.toLowerCase() !== true) {
             this.throw(404, 'Bad syntax for simplify. Must be "true".');
         }
         const data = yield CartoServiceV2.getRegional(this.params.iso, this.params.id1, this.params.id2, thresh);
@@ -168,7 +168,7 @@ class GeoStoreRouterV2 {
     static * use() {
         logger.info('Obtaining use data with name %s and id %s', this.params.name, this.params.id);
         let thresh = this.query.simplify ? JSON.parse(this.query.simplify) : null;
-        if (thresh && typeof thresh === Boolean && thresh !== true) {
+        if (thresh && typeof thresh === Boolean && thresh.toLowerCase() !== true) {
             this.throw(404, 'Bad syntax for simplify. Must be "true".');
         }
 
