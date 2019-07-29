@@ -167,7 +167,7 @@ class GeoStoreService {
         const geom_type = geoStore.geojson.type || null;
         if (geom_type && geom_type === "FeatureCollection") {
             logger.info("Preserving FeatureCollection properties.")
-            props = geoStore.geojson.features[0].geometry.properties || null;
+            props = geoStore.geojson.features[0].properties || null;
         } else if(geom_type && geom_type === 'Feature'){
             logger.info("Preserving Feature properties.")
             props = geoStore.geojson.properties || null;
@@ -175,6 +175,7 @@ class GeoStoreService {
             logger.info("Preserving Geometry properties.")
             props = geoStore.geojson.properties || null;
         }
+        logger.debug('Props', JSON.stringify(props));
         if (data && data.info) {
             geoStore.info = data.info;
         }
