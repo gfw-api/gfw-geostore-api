@@ -2,14 +2,14 @@
 
 let logger = require('logger');
 
-module.exports.makeFeatureCollection = function(data){
+module.exports.makeFeatureCollection = function(data, props){
     if(data.type === 'FeatureCollection'){
         logger.debug('Is a FeatureCollection');
-        data.features.properties = null;
+        data.features.properties = props;
         return data;
     } else if(data.type === 'Feature'){
         logger.debug('Is a feature');
-        data.properties = null;
+        data.properties = props;
         return {
             type: 'FeatureCollection',
             features:[data],
@@ -26,7 +26,7 @@ module.exports.makeFeatureCollection = function(data){
             type: 'FeatureCollection',
             features:[{
                 type: 'Feature',
-                properties: null,
+                properties: props,
                 geometry: data
             }],
           /*  crs: { 
