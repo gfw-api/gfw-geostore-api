@@ -23,6 +23,7 @@ const executeThunk = function (client, sql, params) {
     };
 };
 
+
 class GeoStoreService {
 
     static getGeometryType(geojson) {
@@ -166,13 +167,13 @@ class GeoStoreService {
         let props = null;
         const geom_type = geoStore.geojson.type || null;
         if (geom_type && geom_type === "FeatureCollection") {
-            logger.info("Preserving FeatureCollection properties.")
+            logger.info('Preserving FeatureCollection properties.')
             props = geoStore.geojson.features[0].properties || null;
-        } else if(geom_type && geom_type === 'Feature'){
-            logger.info("Preserving Feature properties.")
+        } else if(geom_type && geom_type === "Feature"){
+            logger.info('Preserving Feature properties.')
             props = geoStore.geojson.properties || null;
         } else{
-            logger.info("Preserving Geometry properties.")
+            logger.info('Preserving Geometry properties.')
             props = geoStore.geojson.properties || null;
         }
         logger.debug('Props', JSON.stringify(props));
