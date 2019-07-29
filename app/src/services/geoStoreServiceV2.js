@@ -206,7 +206,7 @@ class GeoStoreServiceV2 {
             logger.debug('Repaired geometry', JSON.stringify(geoStore.geojson));
         }
         logger.debug('Make Feature Collection');
-        geoStore.geojson = GeoJSONConverter.makeFeatureCollection(geoStore.geojson);
+        geoStore.geojson = GeoJSONConverter.makeFeatureCollection(geoStore.geojson, props);
         if (process.env.NODE_ENV !== 'test' || geoStore.geojson.length < 2000) {
             logger.debug('Result', JSON.stringify(geoStore.geojson));
         }
