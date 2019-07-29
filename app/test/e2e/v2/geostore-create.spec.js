@@ -2,7 +2,6 @@
 const nock = require('nock');
 const chai = require('chai');
 const config = require('config');
-const logger = require('logger');
 
 const { getTestServer } = require('../test-server');
 
@@ -63,9 +62,7 @@ describe('Geostore v2 tests - Create geostores', () => {
                     "type": "FeatureCollection",
                     "features": [{
                         "type": "Feature",
-                        "properties": {
-                            "some": "property"
-                        },
+                        "properties": {},
                         "geometry": {
                             "type": "MultiPoint",
                             "coordinates": [
@@ -178,6 +175,7 @@ describe('Geostore v2 tests - Create geostores', () => {
         response.body.data.attributes.geojson.should.have.property('features').and.be.an('array').and.length(1);
         response.body.data.attributes.geojson.should.have.property('crs').and.be.an('object');
         response.body.data.attributes.geojson.should.have.property('type').and.equal('FeatureCollection');
+
         response.body.data.attributes.geojson.features[0].should.have.property('properties');
         response.body.data.attributes.geojson.features[0].should.have.property('type').and.equal('Feature');
         response.body.data.attributes.geojson.features[0].should.have.property('geometry').and.be.an('object');
