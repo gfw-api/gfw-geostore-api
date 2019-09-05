@@ -72,7 +72,8 @@ class CartoDBService {
         logger.debug('Obtaining national of iso %s', iso);
         const query = {
             'info.iso': iso.toUpperCase(),
-            'info.id1': null
+            'info.id1': null,
+            'info.id2': null
         };
         logger.debug('Checking existing national geo');
         let existingGeo = yield GeoStoreService.getGeostoreByInfoProps(query);
@@ -129,7 +130,8 @@ class CartoDBService {
         logger.debug('Obtaining subnational of iso %s and id1', iso, id1);
         const params = {
             iso: iso.toUpperCase(),
-            id1: parseInt(id1, 10)
+            id1: parseInt(id1, 10),
+            id2: null
         };
 
         logger.debug('Checking existing subnational geo');

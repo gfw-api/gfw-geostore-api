@@ -99,7 +99,9 @@ class CartoDBServiceV2 {
         logger.debug('Checking existing national geo');
         const query = {
             'info.iso': iso.toUpperCase(),
-            'info.simplifyThresh': thresh
+            'info.simplifyThresh': thresh,
+            'info.id1': null,
+            'info.id2': null,
         };
         let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfoProps(query);
         logger.debug('Existed geo', existingGeo);
@@ -163,7 +165,8 @@ class CartoDBServiceV2 {
         const query = {
             'info.iso': iso.toUpperCase(),
             'info.id1': id1,
-            'info.simplifyThresh': thresh
+            'info.id2': null,
+            'info.simplifyThresh': thresh,
         };
 
         logger.debug('Checking existing subnational geo');
