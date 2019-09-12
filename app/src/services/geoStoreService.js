@@ -165,6 +165,21 @@ class GeoStoreService {
                 filter: data.provider.filter
             };
         }
+
+        let props = null;
+        const geom_type = geoStore.geojson.type || null;
+        if (geom_type && geom_type === "FeatureCollection") {
+            logger.info('Preserving FeatureCollection properties.')
+            props = geoStore.geojson.features[0].properties || null;
+        } else if(geom_type && geom_type === "Feature"){
+            logger.info('Preserving Feature properties.')
+            props = geoStore.geojson.properties || null;
+        } else{
+            logger.info('Preserving Geometry properties.')
+            props = geoStore.geojson.properties || null;
+        }
+        logger.debug('Props', JSON.stringify(props));
+        
         if (data && data.info) {
             geoStore.info = data.info;
         }
@@ -178,7 +193,7 @@ class GeoStoreService {
 
         logger.debug('Repaired geometry', JSON.stringify(geoStore.geojson));
         logger.debug('Make Feature Collection');
-        geoStore.geojson = GeoJSONConverter.makeFeatureCollection(geoStore.geojson);
+        geoStore.geojson = GeoJSONConverter.makeFeatureCollection(geoStore.geojson, props);
         logger.debug('Result', JSON.stringify(geoStore.geojson));
         logger.debug('Creating hash from geojson md5');
         geoStore.hash = md5(JSON.stringify(geoStore.geojson));

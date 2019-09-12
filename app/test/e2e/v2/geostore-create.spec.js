@@ -3,6 +3,8 @@ const nock = require('nock');
 const chai = require('chai');
 const config = require('config');
 
+const logger = require('logger');
+
 const { getTestServer } = require('../utils/test-server');
 
 const should = chai.should();
@@ -62,7 +64,9 @@ describe('Geostore v2 tests - Create geostores', () => {
                     type: 'FeatureCollection',
                     features: [{
                         type: 'Feature',
-                        properties: {},
+                        "properties": {
+                        "some": "property"
+                      },
                         geometry: {
                             type: 'MultiPoint',
                             coordinates: [
