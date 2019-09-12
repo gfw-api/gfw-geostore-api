@@ -89,12 +89,8 @@ class CartoDBService {
             const result = data.rows[0];
             logger.debug('Saving national geostore');
             const geoData = {
-                info: {
-                    iso: iso.toUpperCase(),
-                    id1: null,
-                    id2: null,
-                    gadm: '2.8'
-                }
+                info: query,
+                gadm: '2.8'
             };
             geoData.info.name = result.name;
             existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
