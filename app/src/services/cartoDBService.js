@@ -70,13 +70,13 @@ class CartoDBService {
 
     * getNational(iso) {
         logger.debug('Obtaining national of iso %s', iso);
-        const query = {
+        const params = {
             'info.iso': iso.toUpperCase(),
             'info.id1': null,
             'info.id2': null
         };
         logger.debug('Checking existing national geo');
-        let existingGeo = yield GeoStoreService.getGeostoreByInfoProps(query);
+        let existingGeo = yield GeoStoreService.getGeostoreByInfoProps(params);
         logger.debug('Existed geo', existingGeo);
         if (existingGeo) {
             logger.debug('Return national geojson stored');
@@ -89,7 +89,7 @@ class CartoDBService {
             const result = data.rows[0];
             logger.debug('Saving national geostore');
             const geoData = {
-                info: query,
+                info: params,
                 gadm: '2.8'
             };
             geoData.info.name = result.name;
