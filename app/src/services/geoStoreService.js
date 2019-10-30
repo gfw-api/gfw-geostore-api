@@ -108,6 +108,20 @@ class GeoStoreService {
         return null;
     }
 
+    static* getMultipleGeostores(ids) {
+        logger.debug(`Getting geostores with ids: ${ids}`);
+        const hashes = yield ids.map(id => {
+            return GeoStoreService.getNewHash(id)
+        });
+        const query =  { hash: { $in: hashes } };
+        const geoStores = yield GeoStore.find(query);
+
+        if (geoStores && geoStores.length > 0) {
+            return geoStores;
+        }
+        return null;
+    }
+
     static* getNationalList() {
         logger.debug('Obtaining national list from database');
         const query = {
