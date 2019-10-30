@@ -22,12 +22,12 @@
       ]
     },
     {
-      "url": "/v1/geostore/multiple",
+      "url": "/v1/geostore/find-by-ids",
       "method": "POST",
       "endpoints": [
         {
           "method": "POST",
-          "path": "/api/v1/geostore/multiple"
+          "path": "/api/v1/geostore/find-by-ids"
         }
       ]
     },

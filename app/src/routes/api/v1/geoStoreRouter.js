@@ -233,7 +233,7 @@ class GeoStoreRouter {
 
 router.get('/:hash', GeoStoreRouter.getGeoStoreById);
 router.post('/', GeoStoreValidator.create, GeoStoreRouter.createGeoStore);
-router.post('/multiple', GeoStoreRouter.getMultipleGeoStores);
+router.post('/find-by-ids', GeoStoreRouter.getMultipleGeoStores);
 router.post('/area', GeoStoreValidator.create, GeoStoreRouter.getArea);
 router.get('/admin/:iso', GeoStoreRouter.getNational);
 router.get('/admin/list', GeoStoreRouter.getNationalList);
