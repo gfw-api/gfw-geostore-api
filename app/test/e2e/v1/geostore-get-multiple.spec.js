@@ -31,7 +31,7 @@ describe('Geostore v1 tests - Get multiple geostorea', () => {
         nock.cleanAll();
     });
 
-    it('Get geostores that have been saved to the local database should return a 200', async () => {
+    it('Get geostores that have been saved to the local database should max of 2 geosstores, return a 200', async () => {
         const createdGeostore1 = await createGeostore({areaHa:205.64210228373287, bbox: [], info: { iso: 'MCO', id1: null, id2: null, gadm: '2.8'} });
         const createdGeostore2 = await createGeostore({areaHa:206.64210228373287, bbox: [], info: { iso: 'BRA', id1: null, id2: null, gadm: '2.8'} });
         const createdGeostore3 = await createGeostore({areaHa:207.64210228373287, bbox: [], info: { iso: 'ESP', id1: null, id2: null, gadm: '2.8'} });
@@ -53,6 +53,7 @@ describe('Geostore v1 tests - Get multiple geostorea', () => {
         response.body.should.have.property('data').and.be.an('array');
         response.body.should.have.property('info').and.be.an('object');
         response.body.info.should.have.property('found').and.equal(3);
+        response.body.info.should.have.property('returned').and.equal(2);
         response.body.info.should.have.property('foundIds').and.be.an('array');
         
     });
