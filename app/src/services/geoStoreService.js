@@ -108,13 +108,13 @@ class GeoStoreService {
         return null;
     }
 
-    static* getMultipleGeostores(ids) {
+    static async getMultipleGeostores(ids) {
         logger.debug(`Getting geostores with ids: ${ids}`);
-        const hashes = yield ids.map(id => {
+        const hashes = await ids.map(id => {
             return GeoStoreService.getNewHash(id)
         });
         const query =  { hash: { $in: hashes } };
-        const geoStores = yield GeoStore.find(query);
+        const geoStores = await GeoStore.find(query);
 
         if (geoStores && geoStores.length > 0) {
             return geoStores;

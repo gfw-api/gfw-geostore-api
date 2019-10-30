@@ -44,14 +44,14 @@ class GeoStoreRouter {
 
     }
 
-    static* getMultipleGeoStores() {
+    static async getMultipleGeoStores() {
         this.assert(this.request.body.geostores, 400, 'Geostores not found');
         const geostores = this.request.body.geostores
         const ids = geostores.map(el => {return el.geostore});
 
         logger.debug('Getting geostore by hash %s', ids);
 
-        let geoStores = yield GeoStoreService.getMultipleGeostores(ids);
+        let geoStores = await GeoStoreService.getMultipleGeostores(ids);
         if (!geoStores || geoStores.length === 0) {
             this.throw(404, 'No GeoStores found');
             return;
