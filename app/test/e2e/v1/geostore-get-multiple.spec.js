@@ -5,7 +5,7 @@ const config = require('config');
 const GeoStore = require('models/geoStore');
 const logger = require('logger');
 
-const { createGeostore } = require('../utils/utils');
+const { createGeostore, getUUID } = require('../utils/utils');
 const { getTestServer } = require('../utils/test-server');
 
 const should = chai.should();
@@ -54,6 +54,33 @@ describe('Geostore v1 tests - Get multiple geostorea', () => {
         response.body.should.have.property('info').and.be.an('object');
         response.body.info.should.have.property('found').and.equal(3);
         response.body.info.should.have.property('returned').and.equal(2);
+        response.body.info.should.have.property('foundIds').and.be.an('array');
+        
+    });
+
+    it('Get geostores some geostores that dont exist return a 200', async () => {
+        const createdGeostore1 = await createGeostore({areaHa:205.64210228373287, bbox: [], info: { iso: 'MCO', id1: null, id2: null, gadm: '2.8'} });
+        const randomGeostoreID1 = getUUID();
+        const randomGeostoreID2 = getUUID();
+
+        const response = await requester.post(`/api/v1/geostore/find-by-ids`)
+            .send({
+                geostores: [
+                    {
+                        geostore: createdGeostore1.hash
+                    },{
+                        geostore: randomGeostoreID1
+                    },{
+                        geostore: randomGeostoreID2
+                    }
+                ]
+            });
+
+        response.status.should.equal(200);
+        response.body.should.have.property('data').and.be.an('array');
+        response.body.should.have.property('info').and.be.an('object');
+        response.body.info.should.have.property('found').and.equal(1);
+        response.body.info.should.have.property('returned').and.equal(1);
         response.body.info.should.have.property('foundIds').and.be.an('array');
         
     });
