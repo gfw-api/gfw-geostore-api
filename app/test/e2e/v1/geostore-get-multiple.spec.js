@@ -31,7 +31,7 @@ describe('Geostore v1 tests - Get multiple geostorea', () => {
         nock.cleanAll();
     });
 
-    it('Get geostores that have been saved to the local database should max of 2 geosstores, return a 200', async () => {
+    it('Get geostores that have been saved to the local database should max of 2 geostores, return a 200', async () => {
         const createdGeostore1 = await createGeostore({
             areaHa: 205.64210228373287,
             bbox: [],
