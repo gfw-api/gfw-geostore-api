@@ -1,5 +1,5 @@
 
-const logger = require('logger');
+const GeoJSONSerializer = require('serializers/geoJSONSerializer');
 
 
 class GeoStoreListSerializer {
@@ -8,7 +8,7 @@ class GeoStoreListSerializer {
         return {
             data: data.geostores.map((el) => ({
                 geostoreId: el.hash,
-                geojson: el.geojson
+                geostore: GeoJSONSerializer.serialize(el)
             })),
             info: {
                 found: data.found,
