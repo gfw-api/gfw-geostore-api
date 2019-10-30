@@ -12,12 +12,13 @@ const ProviderNotFound = require('errors/providerNotFound');
 const GeoJSONNotFound = require('errors/geoJSONNotFound');
 const { geojsonToArcGIS } = require('arcgis-to-geojson-utils');
 const { arcgisToGeoJSON } = require('arcgis-to-geojson-utils');
+const config = require('config');
 
 const router = new Router({
     prefix: '/geostore'
 });
 
-const LIMIT = 50;
+const MAX_GEOSTORES_BY_ID = config.get('constants.max_geostores_by_id');
 
 class GeoStoreRouter {
 
@@ -56,8 +57,8 @@ class GeoStoreRouter {
             return;
         }
         const foundGeoStores = geoStores.length;
-        logger.debug(`Found ${foundGeoStores} matching geostores. Returning ${LIMIT > foundGeoStores ? foundGeoStores : LIMIT}.`);
-        const slicedGeoStores = geoStores.slice(0, LIMIT)
+        logger.debug(`Found ${foundGeoStores} matching geostores. Returning ${MAX_GEOSTORES_BY_ID > foundGeoStores ? foundGeoStores : MAX_GEOSTORES_BY_ID}.`);
+        const slicedGeoStores = geoStores.slice(0, MAX_GEOSTORES_BY_ID)
         const parsedData = {
             geostores: slicedGeoStores,
             geostoresFound: geoStores.map(el => el.hash),

@@ -21,5 +21,8 @@
   },
   "cartoDB": {
     "user": null
+  },
+  "constants": {
+    "max_geostores_by_id": 50
   }
 }
