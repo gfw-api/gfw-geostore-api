@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const logger = require('logger');
 const GeoStoreValidator = require('validators/geoStoreValidator');
 const GeoJSONSerializer = require('serializers/geoJSONSerializer');
+const GeoStoreListSerializer = require('serializers/geoStoreListSerializer');
 const AreaSerializer = require('serializers/areaSerializer');
 const CountryListSerializer = require('serializers/countryListSerializer');
 const CartoService = require('services/cartoDBService');
@@ -15,6 +16,8 @@ const { arcgisToGeoJSON } = require('arcgis-to-geojson-utils');
 const router = new Router({
     prefix: '/geostore'
 });
+
+const LIMIT = 50;
 
 class GeoStoreRouter {
 
@@ -37,6 +40,32 @@ class GeoStoreRouter {
         }
 
         this.body = GeoJSONSerializer.serialize(geoStore);
+
+    }
+
+    static* getMultipleGeoStores() {
+        this.assert(this.request.body.geostores, 400, 'Geostores not found');
+        const geostores = this.request.body.geostores
+        const ids = geostores.map(el => {return el.geostore});
+
+        logger.debug('Getting geostore by hash %s', ids);
+
+        let geoStores = yield GeoStoreService.getMultipleGeostores(ids);
+        if (!geoStores || geoStores.length === 0) {
+            this.throw(404, 'No GeoStores found');
+            return;
+        }
+        const foundGeoStores = geoStores.length;
+        logger.debug(`Found ${foundGeoStores} matching geostores. Returning ${LIMIT > foundGeoStores ? foundGeoStores : LIMIT}.`);
+        const slicedGeoStores = geoStores.slice(0, LIMIT)
+        const parsedData = {
+            geostores: slicedGeoStores,
+            geostoresFound: geoStores.map(el => el.hash),
+            found: foundGeoStores,
+            returned: slicedGeoStores.length
+
+        }
+        this.body = GeoStoreListSerializer.serialize(parsedData);
 
     }
 
@@ -204,6 +233,7 @@ class GeoStoreRouter {
 
 router.get('/:hash', GeoStoreRouter.getGeoStoreById);
 router.post('/', GeoStoreValidator.create, GeoStoreRouter.createGeoStore);
+router.post('/multiple', GeoStoreRouter.getMultipleGeoStores);
 router.post('/area', GeoStoreValidator.create, GeoStoreRouter.getArea);
 router.get('/admin/:iso', GeoStoreRouter.getNational);
 router.get('/admin/list', GeoStoreRouter.getNationalList);
