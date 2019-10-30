@@ -22,6 +22,16 @@
       ]
     },
     {
+      "url": "/v1/geostore/multiple",
+      "method": "POST",
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/geostore/multiple"
+        }
+      ]
+    },
+    {
       "url": "/v1/geostore/area",
       "method": "POST",
       "endpoints": [
