@@ -61,7 +61,7 @@ describe('GeoJSON serializer test', () => {
         const response = GeoJSONSerializer.serialize(single);
         response.should.not.be.an('array');
         response.should.have.property('data');
-        const data = response.data;
+        const { data } = response;
         data.should.have.property('type');
         data.should.have.property('attributes');
         data.should.have.property('id');
@@ -77,7 +77,7 @@ describe('GeoJSON serializer test', () => {
         feature.type.should.be.equal(single.geojson.features[0].type);
         feature.should.have.property('geometry');
         feature.geometry.should.be.an('object');
-        const geometry = feature.geometry;
+        const { geometry } = feature;
         geometry.should.have.property('type');
         geometry.type.should.be.equal(single.geojson.features[0].geometry.type);
         geometry.should.have.a.property('coordinates');
@@ -90,7 +90,7 @@ describe('GeoJSON serializer test', () => {
         const response = GeoJSONSerializer.serialize(severalFeatures);
         response.should.not.be.an('array');
         response.should.have.property('data');
-        const data = response.data;
+        const { data } = response;
         data.should.have.property('type');
         data.should.have.property('attributes');
         data.should.have.property('id');
@@ -106,7 +106,7 @@ describe('GeoJSON serializer test', () => {
         feature.type.should.be.equal(severalFeatures.geojson.features[0].type);
         feature.should.have.property('geometry');
         feature.geometry.should.be.an('object');
-        const geometry = feature.geometry;
+        const { geometry } = feature;
         geometry.should.have.property('type');
         geometry.type.should.be.equal(severalFeatures.geojson.features[0].geometry.type);
         geometry.should.have.a.property('coordinates');

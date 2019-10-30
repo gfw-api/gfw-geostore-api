@@ -57,7 +57,7 @@ describe('Error serializer test', () => {
         feature.should.have.property('geometry');
         feature.geometry.should.be.an('object');
 
-        const geometry = feature.geometry;
+        const { geometry } = feature;
         geometry.should.have.property('type');
         geometry.type.should.be.equal(featureCollectionExample.features[0].geometry.type);
         geometry.should.have.a.property('coordinates');
@@ -79,7 +79,7 @@ describe('Error serializer test', () => {
         feature.should.have.property('geometry');
         feature.geometry.should.be.an('object');
 
-        const geometry = feature.geometry;
+        const { geometry } = feature;
         geometry.should.have.property('type');
         geometry.type.should.be.equal(featureCollectionExample.features[0].geometry.type);
         geometry.should.have.a.property('coordinates');
@@ -101,7 +101,7 @@ describe('Error serializer test', () => {
         feature.should.have.property('geometry');
         feature.geometry.should.be.an('object');
 
-        const geometry = feature.geometry;
+        const { geometry } = feature;
         geometry.should.have.property('type');
         geometry.type.should.be.equal(featureCollectionExample.features[0].geometry.type);
         geometry.should.have.a.property('coordinates');

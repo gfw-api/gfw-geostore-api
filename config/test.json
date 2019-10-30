@@ -11,6 +11,6 @@
     "port": 27017
   },
   "constants": {
-    "max_geostores_by_id": 2
+    "maxGeostoresFoundById": 2
   }
 }

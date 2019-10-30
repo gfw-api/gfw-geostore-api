@@ -59,14 +59,14 @@ describe('Geostore v1 tests - Create geostores', () => {
             .send({
                 geojson: {
                     type: 'FeatureCollection',
-                    "properties": {
-                        "some": "property"
-                      },
+                    properties: {
+                        some: 'property'
+                    },
                     features: [{
                         type: 'Feature',
-                        "properties": {
-                        "some": "property"
-                      },
+                        properties: {
+                            some: 'property'
+                        },
                         geometry: {
                             type: 'MultiPoint',
                             coordinates: [

@@ -171,14 +171,14 @@ class GeoStoreServiceV2 {
         }
         let props = null;
         const geom_type = geoStore.geojson.type || null;
-        if (geom_type && geom_type === "FeatureCollection") {
-            logger.info('Preserving FeatureCollection properties.')
+        if (geom_type && geom_type === 'FeatureCollection') {
+            logger.info('Preserving FeatureCollection properties.');
             props = geoStore.geojson.features[0].properties || null;
-        } else if(geom_type && geom_type === "Feature"){
-            logger.info('Preserving Feature properties.')
+        } else if (geom_type && geom_type === 'Feature') {
+            logger.info('Preserving Feature properties.');
             props = geoStore.geojson.properties || null;
-        } else{
-            logger.info('Preserving Geometry properties.')
+        } else {
+            logger.info('Preserving Geometry properties.');
             props = geoStore.geojson.properties || null;
         }
         logger.debug('Props', JSON.stringify(props));

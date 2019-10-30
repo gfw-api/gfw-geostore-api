@@ -18,8 +18,6 @@ const router = new Router({
     prefix: '/geostore'
 });
 
-const MAX_GEOSTORES_BY_ID = config.get('constants.max_geostores_by_id');
-
 class GeoStoreRouter {
 
     static* getGeoStoreById() {
@@ -46,26 +44,26 @@ class GeoStoreRouter {
 
     static async getMultipleGeoStores() {
         this.assert(this.request.body.geostores, 400, 'Geostores not found');
-        const geostores = this.request.body.geostores
-        const ids = geostores.map(el => {return el.geostore});
+        const { geostores } = this.request.body;
+        const ids = geostores.map((el) => el.geostore);
 
         logger.debug('Getting geostore by hash %s', ids);
 
-        let geoStores = await GeoStoreService.getMultipleGeostores(ids);
+        const geoStores = await GeoStoreService.getMultipleGeostores(ids);
         if (!geoStores || geoStores.length === 0) {
             this.throw(404, 'No GeoStores found');
             return;
         }
         const foundGeoStores = geoStores.length;
-        logger.debug(`Found ${foundGeoStores} matching geostores. Returning ${MAX_GEOSTORES_BY_ID > foundGeoStores ? foundGeoStores : MAX_GEOSTORES_BY_ID}.`);
-        const slicedGeoStores = geoStores.slice(0, MAX_GEOSTORES_BY_ID)
+        logger.debug(`Found ${foundGeoStores} matching geostores. Returning ${config.get('constants.maxGeostoresFoundById') > foundGeoStores ? foundGeoStores : config.get('constants.maxGeostoresFoundById')}.`);
+        const slicedGeoStores = geoStores.slice(0, config.get('constants.maxGeostoresFoundById'));
         const parsedData = {
             geostores: slicedGeoStores,
-            geostoresFound: geoStores.map(el => el.hash),
+            geostoresFound: geoStores.map((el) => el.hash),
             found: foundGeoStores,
             returned: slicedGeoStores.length
 
-        }
+        };
         this.body = GeoStoreListSerializer.serialize(parsedData);
 
     }

@@ -105,7 +105,13 @@ describe('Geostore v1 tests - Get geostore - National level', () => {
     });
 
     it('Get country that has been saved to the local database should return a 200', async () => {
-        const createdNational = await createGeostore({areaHa:205.64210228373287, bbox: [], info: { iso: 'MCO', id1: null, id2: null, gadm: '2.8'} });
+        const createdNational = await createGeostore({
+            areaHa: 205.64210228373287,
+            bbox: [],
+            info: {
+                iso: 'MCO', id1: null, id2: null, gadm: '2.8'
+            }
+        });
         const response = await requester.get(`/api/v1/geostore/admin/MCO`).send();
 
         response.status.should.equal(200);
@@ -122,7 +128,7 @@ describe('Geostore v1 tests - Get geostore - National level', () => {
 
         response.body.data.attributes.info.should.have.property('gadm').and.equal('2.8');
         response.body.data.attributes.info.should.have.property('iso').and.equal('MCO');
-        
+
     });
 
     afterEach(() => {

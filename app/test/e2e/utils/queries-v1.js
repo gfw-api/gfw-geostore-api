@@ -1,4 +1,4 @@
-const createQueryISOName = iso => `SELECT iso, name_0 as name
+const createQueryISOName = (iso) => `SELECT iso, name_0 as name
         FROM gadm2_countries_simple
         WHERE iso in ${iso}`;
 
@@ -17,7 +17,7 @@ const createQueryUSE = (cartodbId, useTable) => `SELECT ST_AsGeoJSON(st_makevali
         FROM ${useTable}
         WHERE cartodb_id = ${cartodbId}`;
 
-const createQueryWDPA = wdpaId => `SELECT ST_AsGeoJSON(st_makevalid(p.the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+const createQueryWDPA = (wdpaId) => `SELECT ST_AsGeoJSON(st_makevalid(p.the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
         FROM (
           SELECT CASE
           WHEN marine::numeric = 2 THEN NULL
@@ -29,7 +29,7 @@ const createQueryWDPA = wdpaId => `SELECT ST_AsGeoJSON(st_makevalid(p.the_geom))
           WHERE wdpaid=${wdpaId}
         ) p`;
 
-const createQueryGeometry = data => `SELECT ST_AsGeoJson(ST_CollectionExtract(st_MakeValid(ST_GeomFromGeoJSON('${data}')),3)) as geojson`;
+const createQueryGeometry = (data) => `SELECT ST_AsGeoJson(ST_CollectionExtract(st_MakeValid(ST_GeomFromGeoJSON('${data}')),3)) as geojson`;
 
 module.exports = {
     createQueryID1,
