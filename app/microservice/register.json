@@ -172,6 +172,16 @@
       ]
     },
     {
+      "url": "/v2/geostore/find-by-ids",
+      "method": "POST",
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v2/geostore/find-by-ids"
+        }
+      ]
+    },
+    {
       "url": "/v2/geostore/area",
       "method": "POST",
       "endpoints": [

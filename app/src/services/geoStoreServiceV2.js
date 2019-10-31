@@ -100,6 +100,14 @@ class GeoStoreServiceV2 {
         return idCon.hash;
     }
 
+    static async getNewHashPromise(hash) {
+        const idCon = await IdConnection.findOne({ oldId: hash }).exec();
+        if (!idCon) {
+            return hash;
+        }
+        return idCon.hash;
+    }
+
     static* getGeostoreById(id) {
         logger.debug(`Getting geostore by id ${id}`);
         const hash = yield GeoStoreServiceV2.getNewHash(id);
@@ -108,6 +116,18 @@ class GeoStoreServiceV2 {
         if (geoStore) {
             logger.debug('geostore', JSON.stringify(geoStore.geojson));
             return geoStore;
+        }
+        return null;
+    }
+
+    static async getMultipleGeostores(ids) {
+        logger.debug(`Getting geostores with ids: ${ids}`);
+        const hashes = await Promise.all(ids.map(GeoStoreServiceV2.getNewHashPromise));
+        const query = { hash: { $in: hashes } };
+        const geoStores = await GeoStore.find(query);
+
+        if (geoStores && geoStores.length > 0) {
+            return geoStores;
         }
         return null;
     }
