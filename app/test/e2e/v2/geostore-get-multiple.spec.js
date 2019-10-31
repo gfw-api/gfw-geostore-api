@@ -14,7 +14,7 @@ let requester;
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
 
-describe('Geostore v1 tests - Get multiple geostorea', () => {
+describe('Geostore v2 tests - Get multiple geostorea', () => {
 
     before(async () => {
         if (process.env.NODE_ENV !== 'test') {
@@ -36,25 +36,25 @@ describe('Geostore v1 tests - Get multiple geostorea', () => {
             areaHa: 205.64210228373287,
             bbox: [],
             info: {
-                iso: 'MCO', id1: null, id2: null, gadm: '2.8'
+                iso: 'MCO', id1: null, id2: null, gadm: '3.6'
             }
         });
         const createdGeostore2 = await createGeostore({
             areaHa: 206.64210228373287,
             bbox: [],
             info: {
-                iso: 'BRA', id1: null, id2: null, gadm: '2.8'
+                iso: 'BRA', id1: null, id2: null, gadm: '3.6'
             }
         });
         const createdGeostore3 = await createGeostore({
             areaHa: 207.64210228373287,
             bbox: [],
             info: {
-                iso: 'ESP', id1: null, id2: null, gadm: '2.8'
+                iso: 'ESP', id1: null, id2: null, gadm: '3.6'
             }
         });
 
-        const response = await requester.post(`/api/v1/geostore/find-by-ids`)
+        const response = await requester.post(`/api/v2/geostore/find-by-ids`)
             .send({
                 geostores: [createdGeostore1.hash, createdGeostore2.hash, createdGeostore3.hash]
             });
@@ -73,13 +73,13 @@ describe('Geostore v1 tests - Get multiple geostorea', () => {
             areaHa: 205.64210228373287,
             bbox: [],
             info: {
-                iso: 'MCO', id1: null, id2: null, gadm: '2.8'
+                iso: 'MCO', id1: null, id2: null, gadm: '3.6'
             }
         });
         const randomGeostoreID1 = getUUID();
         const randomGeostoreID2 = getUUID();
 
-        const response = await requester.post(`/api/v1/geostore/find-by-ids`)
+        const response = await requester.post(`/api/v2/geostore/find-by-ids`)
             .send({
                 geostores: [createdGeostore1.hash, randomGeostoreID1, randomGeostoreID2]
             });
