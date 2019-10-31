@@ -45,7 +45,11 @@ class GeoStoreRouter {
     static async getMultipleGeoStores() {
         this.assert(this.request.body.geostores, 400, 'Geostores not found');
         const { geostores } = this.request.body;
-        const ids = geostores.map((el) => el.geostore);
+        if (!geostores || geostores.length === 0) {
+            this.throw(404, 'No GeoStores in payload');
+            return;
+        }
+        const ids = geostores.map(el => el.trim());
 
         logger.debug('Getting geostore by hash %s', ids);
 

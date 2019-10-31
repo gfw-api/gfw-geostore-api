@@ -23,6 +23,6 @@
     "user": null
   },
   "constants": {
-    "maxGeostoresFoundById": 50
+    "maxGeostoresFoundById": 100
   }
 }
