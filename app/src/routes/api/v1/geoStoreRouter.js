@@ -49,7 +49,7 @@ class GeoStoreRouter {
             this.throw(404, 'No GeoStores in payload');
             return;
         }
-        const ids = geostores.map(el => el.trim());
+        const ids = [...new Set(geostores.map(el => el.trim()))];
 
         logger.debug('Getting geostore by hash %s', ids);
 
