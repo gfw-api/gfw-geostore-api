@@ -8,7 +8,7 @@ const ISO = `SELECT ST_AsGeoJSON(ST_MAKEVALID({geom})) AS geojson, area_ha, name
         FROM gadm36_countries
         WHERE gid_0 = UPPER('{{iso}}')`;
 
-const ISO_NAME = `SELECT gid_0, name_0 as name
+const ISO_NAME = `SELECT gid_0 as iso, name_0 as name
         FROM gadm36_adm0
         WHERE gid_0 in `;
 

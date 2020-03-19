@@ -1,3 +1,9 @@
+## 19/03/2020
+
+- Fix issue in loading ISO codes from Carto on v2 admin list endpoint 
+
+## Previous
+
 - Update node to v12.x
 - Replace `npm` with `yarn`
 - Update development dependencies
