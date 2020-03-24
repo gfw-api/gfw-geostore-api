@@ -55,7 +55,7 @@
     "koa-simple-healthcheck": "^0.0.1",
     "koa-validate": "0.2.11",
     "md5": "2.1.0",
-    "mongoose": "4.13.19",
+    "mongoose": "5.7.5",
     "mustache": "^2.3.2",
     "sleep": "^6.1.0",
     "turf": "^3.0.11"
