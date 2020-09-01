@@ -218,17 +218,14 @@ class GeoStoreService {
             geoStore.bbox = turf.bbox(geoStore.geojson);
         }
 
-        await GeoStore.findOneAndUpdate({ hash: geoStore.hash }, geoStore, {
+        return GeoStore.findOneAndUpdate({ hash: geoStore.hash }, geoStore, {
             upsert: true,
             new: true,
-            runValidators: true
-        });
-
-        return GeoStore.findOne({
-            hash: geoStore.hash
-        }, {
-            'geojson._id': 0,
-            'geojson.features._id': 0
+            runValidators: true,
+            projection: {
+                'geojson._id': 0,
+                'geojson.features._id': 0
+            }
         });
     }
 

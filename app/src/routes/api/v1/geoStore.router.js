@@ -90,10 +90,6 @@ class GeoStoreRouter {
             }
 
             const geostore = await GeoStoreService.saveGeostore(ctx.request.body.geojson, data);
-            if (process.env.NODE_ENV !== 'test' || geostore.geojson.length < 2000) {
-                logger.debug(JSON.stringify(geostore.geojson));
-            }
-
             ctx.body = GeoJSONSerializer.serialize(geostore);
         } catch (err) {
             if (err instanceof ProviderNotFound || err instanceof GeoJSONNotFound) {
