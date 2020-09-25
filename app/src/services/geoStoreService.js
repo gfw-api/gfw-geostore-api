@@ -242,7 +242,7 @@ class GeoStoreService {
 
         logger.debug('Converting geojson');
         logger.debug('Converting', JSON.stringify(geoStore.geojson));
-        geoStore.geojson = GeoJSONConverter.convert(geoStore.geojson);
+        geoStore.geojson = GeoJSONConverter.makeFeatureCollection(geoStore.geojson);
         logger.debug('Result', JSON.stringify(geoStore.geojson));
         geoStore.areaHa = turf.area(geoStore.geojson) / 10000; // convert to ha2
         geoStore.bbox = turf.bbox(geoStore.geojson);
