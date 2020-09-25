@@ -1,3 +1,7 @@
+## 25/09/2020
+
+- Fix issue when creating area geostore.
+
 # v1.1.3
 
 ## 02/09/2020
