@@ -1,4 +1,3 @@
-
 class ProviderNotFound extends Error {
 
     constructor(message) {

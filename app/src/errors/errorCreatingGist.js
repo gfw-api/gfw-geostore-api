@@ -1,4 +1,3 @@
-
 class ErrorCreatingGist extends Error {
 
     constructor(message) {

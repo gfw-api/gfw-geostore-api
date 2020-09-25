@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const nock = require('nock');
 const chai = require('chai');
 const config = require('config');
@@ -94,7 +95,7 @@ describe('Geostore v1 tests - Getting geodata by wdpa', () => {
     });
 
     afterEach(async () => {
-        GeoStore.deleteMany({}).exec();
+        await GeoStore.deleteMany({}).exec();
 
         if (!nock.isDone()) {
             throw new Error(`Not all nock interceptors were used: ${nock.pendingMocks()}`);

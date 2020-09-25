@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars,no-undef */
+/* eslint-disable max-len */
 const nock = require('nock');
 const chai = require('chai');
 const config = require('config');
@@ -25,7 +25,7 @@ describe('Geostore v1 tests - Get geostore - National level', () => {
 
         requester = await getTestServer();
 
-        GeoStore.deleteMany({}).exec();
+        await GeoStore.deleteMany({}).exec();
 
         nock.cleanAll();
     });
@@ -84,7 +84,6 @@ describe('Geostore v1 tests - Get geostore - National level', () => {
                 total_rows: 1
             });
 
-
         const response = await requester.get(`/api/v1/geostore/admin/MCO`).send();
 
         response.status.should.equal(200);
@@ -105,7 +104,7 @@ describe('Geostore v1 tests - Get geostore - National level', () => {
     });
 
     it('Get country that has been saved to the local database should return a 200', async () => {
-        const createdNational = await createGeostore({
+        await createGeostore({
             areaHa: 205.64210228373287,
             bbox: [],
             info: {
@@ -131,13 +130,11 @@ describe('Geostore v1 tests - Get geostore - National level', () => {
 
     });
 
-    afterEach(() => {
+    afterEach(async () => {
+        await GeoStore.deleteMany({}).exec();
+
         if (!nock.isDone()) {
             throw new Error(`Not all nock interceptors were used: ${nock.pendingMocks()}`);
         }
-    });
-
-    after(() => {
-        GeoStore.deleteMany({}).exec();
     });
 });

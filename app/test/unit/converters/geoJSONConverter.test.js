@@ -1,6 +1,5 @@
 const GeoJSONConverter = require('converters/geoJSONConverter');
 
-
 describe('Error serializer test', () => {
     const featureCollectionExample = {
         type: 'FeatureCollection',

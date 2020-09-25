@@ -27,12 +27,10 @@ const WDPA = `with p as (SELECT p.the_geom AS the_geom
 
 const USE = `SELECT slug FROM coverage_layers cl, {{useTable}} c where c.cartodb_id = {{pid}} and ST_INTERSECTS(cl.the_geom, c.the_geom)`;
 
-
 const COVERAGES = `SELECT ST_AsGeoJSON(the_geom) as geojson, coverage_slug as slug, slug as layerSlug from coverage_layers`;
 
 const WORLD = `SELECT slug FROM coverage_layers where ST_INTERSECTS(the_geom, ST_SetSRID(ST_GeomFromGeoJSON('{{{geojson}}}'), 4326))`;
 const REDUCED_WORLD = `with p as (SELECT slug, the_geom FROM coverage_layers {{{filter}}}) SELECT slug FROM p  where ST_INTERSECTS(the_geom, ST_SetSRID(ST_GeomFromGeoJSON('{{{geojson}}}'), 4326))`;
-
 
 const executeThunk = (client, sql, params) => new Promise(((resolve, reject) => {
     client.execute(sql, params).done((data) => {
@@ -41,7 +39,6 @@ const executeThunk = (client, sql, params) => new Promise(((resolve, reject) => 
         reject(err[0]);
     });
 }));
-
 
 class CoverageService {
 

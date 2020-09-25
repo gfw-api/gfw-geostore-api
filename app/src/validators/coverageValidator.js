@@ -1,4 +1,3 @@
-
 const logger = require('logger');
 const ErrorSerializer = require('serializers/errorSerializer');
 

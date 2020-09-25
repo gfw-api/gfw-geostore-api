@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars,no-undef */
+/* eslint-disable max-len */
 const nock = require('nock');
 const chai = require('chai');
 const config = require('config');
@@ -6,9 +6,8 @@ const GeoStore = require('models/geoStore');
 const fs = require('fs');
 const path = require('path');
 
-const {
-    getTestServer
-} = require('../utils/test-server');
+const { getTestServer } = require('../utils/test-server');
+const { createGeostore } = require('../utils/utils');
 
 chai.should();
 
@@ -28,7 +27,7 @@ describe('Geostore v2 tests - Get geostore - SubRegional (admin-2) level', () =>
 
         requester = await getTestServer();
 
-        GeoStore.deleteMany({}).exec();
+        await GeoStore.deleteMany({}).exec();
 
         nock.cleanAll();
     });
@@ -55,7 +54,6 @@ describe('Geostore v2 tests - Get geostore - SubRegional (admin-2) level', () =>
                 },
                 total_rows: 0
             });
-
 
         const response = await requester.get(`/api/v2/geostore/admin/AAA/1/1?simplify=0.005`).send();
 
@@ -92,7 +90,6 @@ describe('Geostore v2 tests - Get geostore - SubRegional (admin-2) level', () =>
                 total_rows: 1
             });
 
-
         const response = await requester.get(`/api/v2/geostore/admin/GBR/1/1?simplify=0.005`).send();
 
         response.status.should.equal(200);
@@ -116,6 +113,8 @@ describe('Geostore v2 tests - Get geostore - SubRegional (admin-2) level', () =>
     });
 
     it('Get a subregion that has been saved to the local database should return a 200', async () => {
+        await createGeostore(JSON.parse(fs.readFileSync(path.join(__dirname, 'resources', 'GBR-1-1-geom.json'))));
+
         const response = await requester.get(`/api/v2/geostore/admin/GBR/1/1?simplify=0.005`).send();
 
         response.status.should.equal(200);
@@ -124,7 +123,7 @@ describe('Geostore v2 tests - Get geostore - SubRegional (admin-2) level', () =>
         response.body.data.should.have.property('id').and.a('string');
         response.body.data.should.have.property('attributes').and.be.an('object');
 
-        response.body.data.attributes.should.have.property('areaHa').and.equal(35086.93865282212);
+        response.body.data.attributes.should.have.property('areaHa').and.equal(35086.9386528221);
         response.body.data.attributes.should.have.property('bbox').and.be.an('array');
         response.body.data.attributes.should.have.property('geojson').and.be.an('object');
         response.body.data.attributes.should.have.property('hash').and.be.a('string');
@@ -138,13 +137,11 @@ describe('Geostore v2 tests - Get geostore - SubRegional (admin-2) level', () =>
         response.body.data.attributes.info.should.have.property('name');
     });
 
-    afterEach(() => {
+    afterEach(async () => {
+        await GeoStore.deleteMany({}).exec();
+
         if (!nock.isDone()) {
             throw new Error(`Not all nock interceptors were used: ${nock.pendingMocks()}`);
         }
-    });
-
-    after(() => {
-        GeoStore.deleteMany({}).exec();
     });
 });

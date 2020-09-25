@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
@@ -65,6 +64,5 @@ GeoStore.index({ 'info.iso': 1, 'info.id1': 1 });
 GeoStore.index({ 'info.iso': 1, 'info.id1': 1, 'info.id2': 1 });
 GeoStore.index({ 'info.wdpaid': 1 });
 GeoStore.index({ 'info.use.use': 1, 'info.use.id': 1 });
-
 
 module.exports = mongoose.model('GeoStore', GeoStore);

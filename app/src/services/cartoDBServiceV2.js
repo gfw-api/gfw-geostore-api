@@ -69,7 +69,6 @@ const parseSimplifyGeom = (iso, id1, id2) => {
 
 };
 
-
 class CartoDBServiceV2 {
 
     constructor() {

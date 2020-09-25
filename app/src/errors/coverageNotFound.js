@@ -1,4 +1,3 @@
-
 class CoverageNotFound extends Error {
 
     constructor(message) {

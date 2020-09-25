@@ -31,7 +31,9 @@ describe('Geostore v2 tests - Getting geodata by wdpa', () => {
 
     it('Getting geodata by wdpa should return result', async () => {
         const createdGeostore = await createGeostore();
+
         const response = await geostoreWDPA.get(`/${createdGeostore.hash}/view`);
+
         response.status.should.equal(200);
         response.body.should.instanceOf(Object).and.have.property('view_link');
         // eslint-disable-next-line camelcase
@@ -54,7 +56,7 @@ describe('Geostore v2 tests - Getting geodata by wdpa', () => {
     });
 
     afterEach(async () => {
-        GeoStore.deleteMany({}).exec();
+        await GeoStore.deleteMany({}).exec();
 
         if (!nock.isDone()) {
             throw new Error(`Not all nock interceptors were used: ${nock.pendingMocks()}`);
