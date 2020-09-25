@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars,no-undef */
+/* eslint-disable no-underscore-dangle */
 const nock = require('nock');
 const chai = require('chai');
 const config = require('config');
@@ -151,8 +151,8 @@ describe('Geostore v1 tests - Get list geostore by use', () => {
     it('Getting geostore by use table custom with doesn\'t existing geo in GEOSTORE should create geostore and return (happy case)',
         checkUseRequestFromQuery('custom', 'custom'));
 
-    afterEach(() => {
-        GeoStore.deleteMany({}).exec();
+    afterEach(async () => {
+        await GeoStore.deleteMany({}).exec();
 
         if (!nock.isDone()) {
             throw new Error(`Not all nock interceptors were used: ${nock.pendingMocks()}`);

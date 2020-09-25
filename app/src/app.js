@@ -33,7 +33,6 @@ if (config.get('logger.level') === 'debug') {
     });
 }
 
-
 async function init() {
     return new Promise((resolve, reject) => {
         async function onDbReady(mongoConnectionError) {
@@ -94,7 +93,6 @@ async function init() {
                 }
             });
 
-
             // load custom validator
             require('validators/geoJSONValidator');
             koaValidate(app);
@@ -104,7 +102,6 @@ async function init() {
 
             // Instance of http module
             // const app = require('http').Server(app.callback());
-
 
             // get port of environment, if not exist obtain of the config.
             // In production environment, the port must be declared in environment variable
@@ -135,7 +132,6 @@ async function init() {
         }
 
         logger.info(`Connecting to MongoDB URL ${mongoUri}`);
-
 
         mongoose.connect(mongoUri, mongooseOptions, onDbReady);
     });

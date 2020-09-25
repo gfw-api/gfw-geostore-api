@@ -54,5 +54,4 @@ class GeoJsonIOService {
 
 }
 
-
 module.exports = GeoJsonIOService;

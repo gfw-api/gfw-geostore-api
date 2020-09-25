@@ -12,7 +12,6 @@ const config = require('config');
 
 const CARTO_PROVIDER = 'carto';
 
-
 const executeThunk = (client, sql, params) => new Promise(((resolve, reject) => {
     client.execute(sql, params).done((data) => {
         resolve(data);
@@ -20,7 +19,6 @@ const executeThunk = (client, sql, params) => new Promise(((resolve, reject) => 
         reject(err[0]);
     });
 }));
-
 
 class GeoStoreServiceV2 {
 

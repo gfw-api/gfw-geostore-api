@@ -8,7 +8,6 @@ const router = new Router({
     prefix: '/coverage'
 });
 
-
 class CoverageRouter {
 
     static async intersectUse(ctx) {
@@ -65,7 +64,6 @@ class CoverageRouter {
         logger.info(`Calculating intersect with geostore ${ctx.query.geostore}`);
         ctx.assert(ctx.query.geostore, 400, 'GeoJSON param required');
         const geoStore = await GeoStoreService.getGeostoreById(ctx.query.geostore);
-
 
         if (!geoStore || !geoStore.geojson) {
             ctx.throw(404, 'Use not found');

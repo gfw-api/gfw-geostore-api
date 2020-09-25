@@ -2,14 +2,13 @@ const nock = require('nock');
 const chai = require('chai');
 const config = require('config');
 const GeoStore = require('models/geoStore');
-const { createRequest } = require('../utils/test-server');
+const { getTestServer } = require('../utils/test-server');
 const { createGeostore, ensureCorrectError } = require('../utils/utils');
 const { DEFAULT_GEOJSON } = require('../utils/test.constants');
 
 chai.should();
 
-const prefix = '/api/v1/geostore';
-let geostoreWDPA;
+let requester;
 
 describe('Geostore v1 tests - Getting geodata by wdpa', () => {
     before(async () => {
@@ -21,17 +20,23 @@ describe('Geostore v1 tests - Getting geodata by wdpa', () => {
         }
 
         nock.cleanAll();
-        geostoreWDPA = await createRequest(prefix, 'get');
+
+        requester = await getTestServer();
     });
 
-    it('Getting geodata by wdpa when data doens\'t exist into geostore should return not found', async () => {
-        const response = await geostoreWDPA.get('/asdsadas/view');
+    it('Getting geodata by hash when data doesn\'t exist into geostore should return not found', async () => {
+        const response = await requester
+            .get(`/api/v1/geostore/asdsadas/view`);
+
         ensureCorrectError(response, 'GeoStore not found', 404);
     });
 
-    it('Getting geodata by wdpa should return result', async () => {
+    it('Getting geodata by hash should return result', async () => {
         const createdGeostore = await createGeostore();
-        const response = await geostoreWDPA.get(`/${createdGeostore.hash}/view`);
+
+        const response = await requester
+            .get(`/api/v1/geostore/${createdGeostore.hash}/view`);
+
         response.status.should.equal(200);
         response.body.should.instanceOf(Object).and.have.property('view_link');
         // eslint-disable-next-line camelcase
@@ -54,7 +59,7 @@ describe('Geostore v1 tests - Getting geodata by wdpa', () => {
     });
 
     afterEach(async () => {
-        GeoStore.deleteMany({}).exec();
+        await GeoStore.deleteMany({}).exec();
 
         if (!nock.isDone()) {
             throw new Error(`Not all nock interceptors were used: ${nock.pendingMocks()}`);

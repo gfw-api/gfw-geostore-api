@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars,no-undef */
+/* eslint-disable max-len */
 const nock = require('nock');
 const chai = require('chai');
 const config = require('config');
-const logger = require('logger');
 
 const { getTestServer } = require('../utils/test-server');
 
