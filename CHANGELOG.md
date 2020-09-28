@@ -1,6 +1,7 @@
 ## 25/09/2020
 
 - Fix issue when creating area geostore.
+- Add error message when trying to view very large geometries.
 
 # v1.1.3
 
