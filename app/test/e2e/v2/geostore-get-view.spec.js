@@ -61,6 +61,7 @@ describe('Geostore v2 tests - Getting geodata by wdpa', () => {
         const geojson = JSON.parse(fs.readFileSync(path.join(__dirname, 'resources', 'giant-geom.json')).toString());
         const geostore = await createGeostore({}, geojson);
         const response = await geostoreWDPA.get(`/${geostore.hash}/view`);
+
         response.status.should.equal(400);
         response.body.should.have.property('errors').and.have.length(1);
         response.body.errors[0].should.have.property('detail').and.equal('Geometry too large, please try again with a smaller geometry.');

@@ -11,6 +11,7 @@ const GeoStoreServiceV2 = require('services/geoStoreServiceV2');
 const GeoJsonIOService = require('services/geoJsonIOService');
 const ProviderNotFound = require('errors/providerNotFound');
 const GeoJSONNotFound = require('errors/geoJSONNotFound');
+const GeometryTooLarge = require('errors/geometryTooLarge');
 const { geojsonToArcGIS } = require('arcgis-to-geojson-utils');
 const { arcgisToGeoJSON } = require('arcgis-to-geojson-utils');
 const config = require('config');
@@ -250,8 +251,16 @@ class GeoStoreRouterV2 {
         }
         logger.debug('GeoStore found. Returning...');
 
-        const geojsonIoPath = await GeoJsonIOService.view(geoStore.geojson);
-        ctx.body = { view_link: geojsonIoPath };
+        try {
+            const geojsonIoPath = await GeoJsonIOService.view(geoStore.geojson);
+            ctx.body = { view_link: geojsonIoPath };
+        } catch (err) {
+            if (err instanceof GeometryTooLarge) {
+                ctx.throw(400, err.message);
+            }
+
+            ctx.throw(500, err.message);
+        }
     }
 
 }
