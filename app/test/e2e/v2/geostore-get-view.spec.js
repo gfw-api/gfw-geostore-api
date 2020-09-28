@@ -1,6 +1,8 @@
 const nock = require('nock');
 const chai = require('chai');
 const config = require('config');
+const fs = require('fs');
+const path = require('path');
 const GeoStore = require('models/geoStore');
 const { createRequest } = require('../utils/test-server');
 const { createGeostore, ensureCorrectError } = require('../utils/utils');
@@ -53,6 +55,15 @@ describe('Geostore v2 tests - Getting geodata by wdpa', () => {
         const responseJSON = JSON.parse(decodeURIComponent(responseJSONEncodedString));
 
         responseJSON.should.deep.equal(expectedGEOJSON);
+    });
+
+    it('Geometries larger than 150000 characters (stringified) are not supported by this endpoint and a 400 Bad Request response is returned', async () => {
+        const geojson = JSON.parse(fs.readFileSync(path.join(__dirname, 'resources', 'giant-geom.json')).toString());
+        const geostore = await createGeostore({}, geojson);
+        const response = await geostoreWDPA.get(`/${geostore.hash}/view`);
+        response.status.should.equal(400);
+        response.body.should.have.property('errors').and.have.length(1);
+        response.body.errors[0].should.have.property('detail').and.equal('Geometry too large, please try again with a smaller geometry.');
     });
 
     afterEach(async () => {
