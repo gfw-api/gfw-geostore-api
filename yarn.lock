@@ -2157,8 +2157,9 @@ fast-safe-stringify@^2.0.4:
   resolved "https://registry.yarnpkg.com/fast-safe-stringify/-/fast-safe-stringify-2.0.7.tgz#124aa885899261f68aedb42a7c080de9da608743"
   integrity sha512-Utm6CdzT+6xsDk2m8S6uL8VHxNwI6Jub+e9NYTcAms28T84pTa25GJQV9j0CY0N1rM8hK4x6grpF2BQf+2qwVA==
 
-"fastly-promises@github:tiagojsag/fastly-promises#master":
+fastly-promises@tiagojsag/fastly-promises#master:
   version "0.0.0-semantically-released"
+  uid "14470364f0d4e62b8ff99c8f7e7dd7cb27039242"
   resolved "https://codeload.github.com/tiagojsag/fastly-promises/tar.gz/14470364f0d4e62b8ff99c8f7e7dd7cb27039242"
   dependencies:
     axios "0.21.1"
@@ -7417,9 +7418,9 @@ xdg-basedir@^3.0.0:
   integrity sha1-SWsswQnsqNus/i3HK2A8F8WHCtQ=
 
 y18n@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/y18n/-/y18n-4.0.0.tgz#95ef94f85ecc81d007c264e190a120f0a3c8566b"
-  integrity sha512-r9S/ZyXu/Xu9q1tYlpsLIsa3EeLXXk0VwlxqTcFRfg9EhMW+17kbt9G0NrgCmhGb5vT2hyhJZLfDGx+7+5Uj/w==
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/y18n/-/y18n-4.0.2.tgz#c504495ba9b59230dd60226d1dd89c3c0a1b745e"
+  integrity sha512-DnBDwcL54b5xWMM/7RfFg4xs5amYxq2ot49aUfLjQSAracXkGvlZq0txzqr3Pa6Q0ayuCxBcwTzrPUScKY0O8w==
 
 yallist@^2.1.2:
   version "2.1.2"
