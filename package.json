@@ -43,7 +43,7 @@
     "co-sleep": "0.0.1",
     "config": "1.19.0",
     "country-data": "0.0.24",
-    "rw-api-microservice-node": "^3.3.3",
+    "rw-api-microservice-node": "^3.4.1",
     "geojsonhint": "1.2.0",
     "jsonapi-serializer": "^3.6.5",
     "koa": "^2.11.0",

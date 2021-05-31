@@ -1,3 +1,7 @@
+## 31/05/2021
+
+- Update `rw-api-microservice-node` to add CORS support.
+
 ## 19/03/2021
 
 - Add MongoDB index to speed up queries by geostore info.
