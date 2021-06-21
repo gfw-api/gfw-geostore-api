@@ -74,7 +74,7 @@ class GeoStoreRouter {
     }
 
     static async createGeoStore(ctx) {
-        logger.info('Saving GeoStore');
+        logger.info('[GeostoreRouter v1 - createGeoStore] Saving GeoStore');
         try {
             const data = {
                 provider: ctx.request.body.provider,
@@ -90,6 +90,7 @@ class GeoStoreRouter {
             }
 
             const geostore = await GeoStoreService.saveGeostore(ctx.request.body.geojson, data);
+            logger.info(`[GeostoreRouter v1 - createGeoStore] Geostore saved, serializing and returning`);
             ctx.body = GeoJSONSerializer.serialize(geostore);
         } catch (err) {
             if (err instanceof ProviderNotFound || err instanceof GeoJSONNotFound) {
