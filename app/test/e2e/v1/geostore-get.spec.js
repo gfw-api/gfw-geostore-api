@@ -61,6 +61,32 @@ describe('Geostore v1 tests - Get geostores', () => {
         hash.should.equal(createdGeostore.hash);
     });
 
+    it('Getting a geostore that crosses the antimeridian should give a bbox [position 0 and 2] from [-180, 180] to [0, 360] (happy case)', async () => {
+        const createdGeostore = await createGeostore();
+        const response = await geostore.get(createdGeostore.hash);
+
+        response.status.should.equal(200);
+        response.body.should.instanceOf(Object).and.have.property('data');
+
+        const { data } = response.body;
+        data.id.should.equal(createdGeostore.hash);
+        data.type.should.equal('geoStore');
+        data.should.have.property('attributes').and.should.instanceOf(Object);
+        data.attributes.should.instanceOf(Object);
+
+        const { geojson, bbox, hash } = data.attributes;
+
+        const expectedGeojson = {
+            ...DEFAULT_GEOJSON,
+            crs: {},
+        };
+        delete expectedGeojson.features[0].properties;
+
+        geojson.should.deep.equal(expectedGeojson);
+        bbox.should.instanceOf(Array);
+        hash.should.equal(createdGeostore.hash);
+    });
+
     it('Getting geostore with format esri should return the result with esrijson (happy case)', async () => {
         const createdGeostore = await createGeostore();
         const response = await geostore.get(createdGeostore.hash).query({ format: 'esri' });
