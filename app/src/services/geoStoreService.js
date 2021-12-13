@@ -151,10 +151,45 @@ class GeoStoreService {
 
         }
     }
+    /**
+     * @description: checks if a bbox crosses the antimeridian
+     * @param {Array} bbox
+     * @returns {Boolean}
+     * 
+     */
+    static async antimeridian(bbox) {
+        logger.debug('Checking antimeridian');
+        const west = bbox[0];
+        const east = bbox[2];
+        if (west > east) {
+            logger.debug('Antimeridian detected');
+            return true;
+        }
+        return false;
+    }
 
+    /**
+     * @description: This function translates a bbox that crosses the antimeridian
+     * @param {Array} bbox 
+     * @returns {Array} bbox with the antimeridian corrected
+     */
+    static async translateBBox(bbox) {
+        logger.debug('Converting bbox from [-180,180] to [0,360]');
+        return [bbox[0], bbox[1], 360 - bbox[2], bbox[3]]
+        
+    }
+    /**
+     * @description: Calculates a bbox.
+     * If a bbox that crosses the antimeridian will be transformed its 
+     * latitudes from [-180, 180] to [0, 360]
+     * @param {geoStore} geoStore
+     * @returns {geoStore}
+     *  
+     **/
     static async calculateBBox(geoStore) {
         logger.debug('Calculating bbox');
-        geoStore.bbox = turf.bbox(geoStore.geojson);
+        const bbox = turf.bbox(geoStore.geojson); 
+        geoStore.bbox = this.antimeridian(bbox) ? this.translateBBox(bbox) : bbox;
         await geoStore.save();
         return geoStore;
     }
@@ -214,7 +249,8 @@ class GeoStoreService {
             hash: geoStore.hash
         });
         if (!geoStore.bbox) {
-            geoStore.bbox = turf.bbox(geoStore.geojson);
+            const bbox = turf.bbox(geoStore.geojson);
+            geoStore.bbox = this.antimeridian(bbox) ? this.translateBBox(bbox) : bbox;
         }
 
         return GeoStore.findOneAndUpdate({ hash: geoStore.hash }, geoStore, {
