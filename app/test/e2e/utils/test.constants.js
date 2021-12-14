@@ -23,10 +23,45 @@ const DEFAULT_GEOJSON = {
     }],
 };
 
+const ANTIMERIDIAN_GEOJSON = {
+    type: 'FeatureCollection',
+    features: [{
+        type: 'Feature',
+        properties: {},
+        geometry: {
+            type: 'Polygon',
+            coordinates: [
+                [
+                    [
+                        176.55029296875,
+                        -20.11783963049162
+                    ],
+                    [
+                        183.09814453125,
+                        -20.11783963049162
+                    ],
+                    [
+                        183.09814453125,
+                        -14.827991347352068
+                    ],
+                    [
+                        176.55029296875,
+                        -14.827991347352068
+                    ],
+                    [
+                        176.55029296875,
+                        -20.11783963049162
+                    ]
+                ]
+            ]
+        }
+    }],
+};
+
 const MOCK_RESULT_CARTODB = [{
     geojson: '{"type":"MultiPolygon","coordinates":[[[[7.4134,43.7346],[7.4396,43.7492],[7.4179,43.7226],[7.4095,43.7299],[7.4134,43.7346]]]]}',
     area_ha: 235.490994944,
     name: 'Monaco'
 }];
 
-module.exports = { DEFAULT_GEOJSON, MOCK_RESULT_CARTODB };
+module.exports = { DEFAULT_GEOJSON, ANTIMERIDIAN_GEOJSON, MOCK_RESULT_CARTODB };
