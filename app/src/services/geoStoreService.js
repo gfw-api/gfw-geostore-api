@@ -152,62 +152,9 @@ class GeoStoreService {
         }
     }
 
-    /**
-     * @description: checks if a bbox crosses the antimeridian
-     * @param {Array} bbox
-     * @returns {Boolean}
-     *
-     */
-    static async antimeridian(bbox) {
-        logger.debug('Checking antimeridian');
-        const west = bbox[0];
-        const east = bbox[2];
-        if (west > east) {
-            logger.debug('Antimeridian detected');
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * @description: This function translates a bbox that crosses the antimeridian
-     * @param {Array} bbox
-     * @returns {Array} bbox with the antimeridian corrected
-     */
-    static translateBBox(bbox) {
-        logger.debug('Converting bbox from [-180,180] to [0,360]');
-        const newBBox = [bbox[0], bbox[1], 360 + bbox[2], bbox[3]];
-        return newBBox;
-
-    }
-
-    /**
-     * @description: Calculates a bbox.
-     * If a bbox that crosses the antimeridian will be transformed its
-     * latitudes from [-180, 180] to [0, 360]
-     * @param {geoStore} geoStore
-     * @returns {bbox}
-     *
-     * */
-    static async swapBBox(geoStore) {
-        const bbox = await turf.bbox(geoStore.geojson);
-        const antimeridian = await GeoStoreService.antimeridian(bbox);
-        logger.info(bbox);
-        return antimeridian ? GeoStoreService.translateBBox(bbox) : bbox;
-
-    }
-
-    /**
-     * @description: Calculates a bbox.
-     * If a bbox that crosses the antimeridian will be transformed its
-     * latitudes from [-180, 180] to [0, 360]
-     * @param {geoStore} geoStore
-     * @returns {geoStore}
-     *
-     * */
     static async calculateBBox(geoStore) {
         logger.debug('Calculating bbox');
-        geoStore.bbox = await GeoStoreService.swapBBox(geoStore);
+        geoStore.bbox = turf.bbox(geoStore.geojson);
         await geoStore.save();
         return geoStore;
     }
@@ -256,24 +203,18 @@ class GeoStoreService {
 
         logger.debug('Repaired geometry', JSON.stringify(geoStore.geojson));
         logger.debug('Make Feature Collection');
-
         geoStore.geojson = GeoJSONConverter.makeFeatureCollection(geoStore.geojson, props);
-
         logger.debug('Result', JSON.stringify(geoStore.geojson));
         logger.debug('Creating hash from geojson md5');
-
         geoStore.hash = md5(JSON.stringify(geoStore.geojson));
-
         if (geoStore.areaHa === undefined) {
             geoStore.areaHa = turf.area(geoStore.geojson) / 10000; // convert to ha2
         }
         await GeoStore.findOne({
             hash: geoStore.hash
         });
-        logger.debug('bbox geostore');
-        logger.debug('geojson', JSON.stringify(geoStore.bbox));
         if (!geoStore.bbox) {
-            geoStore.bbox = await GeoStoreService.swapBBox(geoStore);
+            geoStore.bbox = turf.bbox(geoStore.geojson);
         }
 
         return GeoStore.findOneAndUpdate({ hash: geoStore.hash }, geoStore, {
@@ -304,7 +245,7 @@ class GeoStoreService {
         geoStore.geojson = GeoJSONConverter.makeFeatureCollection(geoStore.geojson);
         logger.debug('Result', JSON.stringify(geoStore.geojson));
         geoStore.areaHa = turf.area(geoStore.geojson) / 10000; // convert to ha2
-        geoStore.bbox = await GeoStoreService.swapBBox(geoStore); // calculate bbox
+        geoStore.bbox = turf.bbox(geoStore.geojson);
 
         return geoStore;
 
