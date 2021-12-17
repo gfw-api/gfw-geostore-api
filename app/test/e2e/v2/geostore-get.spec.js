@@ -4,7 +4,7 @@ const config = require('config');
 
 const { createRequest } = require('../utils/test-server');
 const { getUUID, createGeostore, ensureCorrectError } = require('../utils/utils');
-const { DEFAULT_GEOJSON } = require('../utils/test.constants');
+const { DEFAULT_GEOJSON, ANTIMERIDIAN_GEOJSON } = require('../utils/test.constants');
 
 chai.should();
 
@@ -57,6 +57,38 @@ describe('Geostore v2 tests - Get geostores', () => {
 
         geojson.should.deep.equal(expectedGeojson);
         bbox.should.instanceOf(Array);
+        hash.should.equal(createdGeostore.hash);
+    });
+
+    it('Getting a geostore that crosses the antimeridian should give a bbox [position 0 and 2] from [-180, 180] to [0, 360] (happy case)', async () => {
+        const createdGeostore = await createGeostore({}, ANTIMERIDIAN_GEOJSON);
+        const response = await geostore.get(createdGeostore.hash);
+
+        response.status.should.equal(200);
+        response.body.should.instanceOf(Object).and.have.property('data');
+
+        const { data } = response.body;
+        data.id.should.equal(createdGeostore.hash);
+        data.type.should.equal('geoStore');
+        data.should.have.property('attributes').and.should.instanceOf(Object);
+        data.attributes.should.instanceOf(Object);
+
+        const { geojson, bbox, hash } = data.attributes;
+
+        const expectedGeojson = {
+            ...ANTIMERIDIAN_GEOJSON,
+            crs: {},
+        };
+        delete expectedGeojson.features[0].properties;
+
+        geojson.should.deep.equal(expectedGeojson);
+        bbox.should.instanceOf(Array);
+        bbox.should.deep.equal([
+            176.55029296875,
+            -20.11783963049162,
+            183.09814453125,
+            -14.827991347352068
+        ]);
         hash.should.equal(createdGeostore.hash);
     });
 

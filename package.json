@@ -34,7 +34,9 @@
   },
   "homepage": "https://github.com/gfw-api/gfw-geostore-api#readme",
   "dependencies": {
+    "@mapbox/geojsonhint": "^3.0.1",
     "@octokit/rest": "^16.28.7",
+    "@turf/turf": "^6.5.0",
     "arcgis-to-geojson-utils": "^1.0.1",
     "bunyan": "1.7.1",
     "cartodb": "0.4.0",
@@ -43,8 +45,6 @@
     "co-sleep": "0.0.1",
     "config": "1.19.0",
     "country-data": "0.0.24",
-    "rw-api-microservice-node": "^3.4.1",
-    "geojsonhint": "1.2.0",
     "jsonapi-serializer": "^3.6.5",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.3.0",
@@ -57,8 +57,8 @@
     "md5": "2.1.0",
     "mongoose": "^5.9.14",
     "mustache": "^2.3.2",
-    "sleep": "^6.1.0",
-    "turf": "^3.0.11"
+    "rw-api-microservice-node": "^3.4.1",
+    "sleep": "^6.1.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
