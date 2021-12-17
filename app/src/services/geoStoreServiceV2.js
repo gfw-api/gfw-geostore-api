@@ -4,7 +4,7 @@ const GeoJSONConverter = require('converters/geoJSONConverter');
 const md5 = require('md5');
 const CartoDB = require('cartodb');
 const IdConnection = require('models/idConnection');
-const turf = require('turf');
+const turf = require('@turf/turf');
 const ProviderNotFound = require('errors/providerNotFound');
 const GeoJSONNotFound = require('errors/geoJSONNotFound');
 const UnknownGeometry = require('errors/unknownGeometry');
@@ -125,7 +125,7 @@ class GeoStoreServiceV2 {
     static async getNationalList() {
         logger.debug('[GeoStoreServiceV2 - getGeostoreByInfoProps] Obtaining national list from database');
         const query = {
-            'info.iso': { $gt: "" },
+            'info.iso': { $gt: '' },
             'info.id1': null
         };
         const select = 'hash info.iso';
