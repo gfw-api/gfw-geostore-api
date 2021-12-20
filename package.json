@@ -34,7 +34,6 @@
   },
   "homepage": "https://github.com/gfw-api/gfw-geostore-api#readme",
   "dependencies": {
-    "@mapbox/geojsonhint": "^3.0.1",
     "@octokit/rest": "^16.28.7",
     "@turf/turf": "^6.5.0",
     "arcgis-to-geojson-utils": "^1.0.1",
@@ -45,6 +44,7 @@
     "co-sleep": "0.0.1",
     "config": "1.19.0",
     "country-data": "0.0.24",
+    "geojsonhint": "1.2.0",
     "jsonapi-serializer": "^3.6.5",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.3.0",

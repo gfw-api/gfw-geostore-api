@@ -59,7 +59,7 @@ const ANTIMERIDIAN_GEOJSON = {
 };
 
 const MOCK_RESULT_CARTODB = [{
-    geojson: '{"type":"MultiPolygon","coordinates":[[[[7.4134,43.7346],[7.4095,43.7299],[7.4179,43.7226],[7.4396,43.7492],[7.4134,43.7346]]]]}',
+    geojson: '{"type":"MultiPolygon","coordinates":[[[[7.4134,43.7346],[7.4396,43.7492],[7.4179,43.7226],[7.4095,43.7299],[7.4134,43.7346]]]]}',
     area_ha: 235.490994944,
     name: 'Monaco'
 }];
