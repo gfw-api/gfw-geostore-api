@@ -53,14 +53,14 @@ class GeoStoreService {
              * st_MakeValid: create a valid representation of a given invalid geometry
              *  https://postgis.net/docs/manual-dev/ST_MakeValid.html
              *
-             * ST_CollectionExtract: ensure that the geometry is not a collection of different types
+             * ST_CollectionExtract: ensure that the geometry is not a collection of different geom types
              *
              * In order to ensure a valid geojson representation based on rfc7946, we need to:
              * ST_ForcePolygonCCW: ensure that the exterior ring is counterclockwise as per spec
              * @todo: The geometry needs to enforce the antimeridian split rule over [-180,180] epsg:4326
              * geometries.
              */
-            const sql = `SELECT ST_AsGeoJson(ST_ForcePolygonCCW(ST_CollectionExtract(st_MakeValid(ST_GeomFromGeoJSON('${JSON.stringify(geojson)}')),${geometryType}))) as geojson`;
+            const sql = `SELECT ST_AsGeoJson(ST_CollectionExtract(st_MakeValid( ST_GeomFromGeoJSON('${JSON.stringify(geojson)}')),${geometryType})) as geojson`;
 
             if (process.env.NODE_ENV !== 'test' || sql.length < 2000) {
                 logger.debug('SQL to repair geojson: %s', sql);
@@ -169,7 +169,7 @@ class GeoStoreService {
      * @param {*} bbox
      * @returns boolean
      */
-    static async overFlooded(bbox) {
+    static overFlooded(bbox) {
         return bbox[0] > 180 || bbox[2] > 180;
     }
 
@@ -181,11 +181,23 @@ class GeoStoreService {
      *
      */
     static async crossAntimeridian(feature, bbox) {
-        logger.debug('Checking antimeridian');
+        logger.info('Checking antimeridian');
 
+        const antimeridian = this.overFlooded(bbox);
+        const geomTypes = ['Point', 'MultiPoint'];
+        if (antimeridian) {
+            logger.debug('BBOX crosses antimeridian but is in [0, 360]');
+            return bbox;
+        }
         const westHemiBBox = [-180, -90, 0, 90];
         const eastHemiBBox = [0, -90, 180, 90];
         const bboxTotal = bbox || turf.bbox(feature);
+        logger.info(feature.type);
+        logger.info(feature.geometry.type);
+
+        if (geomTypes.includes(feature.type) || geomTypes.includes(feature.geometry.type)) {
+            return bbox;
+        }
 
         const clippedEastGeom = turf.bboxClip(feature, eastHemiBBox);
         const clippedWestGeom = turf.bboxClip(feature, westHemiBBox);

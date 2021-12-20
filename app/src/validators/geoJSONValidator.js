@@ -1,5 +1,5 @@
 /* eslint-disable func-names */
-const geojsonhint = require('@mapbox/geojsonhint');
+const geojsonhint = require('geojsonhint');
 const koaValidate = require('koa-validate');
 
 (function () {
