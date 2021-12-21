@@ -85,10 +85,10 @@ describe('Geostore v1 tests - Get geostores', () => {
         geojson.should.deep.equal(expectedGeojson);
         bbox.should.instanceOf(Array);
         bbox.should.deep.equal([
-            176.55029296875,
-            -20.11783963049162,
-            183.09814453125,
-            -14.827991347352068
+            176.51542,
+            -34.184289,
+            187,
+            -27.592584
         ]);
         hash.should.equal(createdGeostore.hash);
     });
