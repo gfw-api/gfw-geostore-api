@@ -168,8 +168,8 @@ class GeoStoreService {
     /**
      * @name overFlooded
      * @description check if the geometry overflows the [-180, -90, 180, 90] box
-     * @param {*} bbox
-     * @returns boolean
+     * @param {Array} bbox
+     * @returns {boolean}
      */
     static overFlooded(bbox) {
         return bbox[0] > 180 || bbox[2] > 180;
@@ -192,7 +192,7 @@ class GeoStoreService {
      * @description: checks if a bbox crosses the antimeridian
      * this is a mirror of https://github.com/mapbox/carmen/blob/03fac2d7397ecdfcb4f0828fcfd9d8a54c845f21/lib/util/bbox.js#L59
      * @param {Array} bbox A bounding box array in the format [minX, minY, maxX, maxY]
-     * @returns {Boolean}
+     * @returns {Array}
      *
      */
     static async crossAntimeridian(feature, bbox) {
@@ -262,7 +262,7 @@ class GeoStoreService {
      * the antimeridian will be transformed its
      * latitudes from [-180, 180] to [0, 360]
      * @param {geoStore} geoStore
-     * @returns {bbox}
+     * @returns {Array}
      *
      * */
     static async swapBBox(geoStore) {
