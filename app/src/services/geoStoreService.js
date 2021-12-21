@@ -60,7 +60,7 @@ class GeoStoreService {
              * @todo: The geometry needs to enforce the antimeridian split rule over [-180,180] epsg:4326
              * geometries.
              */
-            const sql = `SELECT ST_AsGeoJson(ST_CollectionExtract(st_MakeValid( ST_GeomFromGeoJSON('${JSON.stringify(geojson)}')),${geometryType})) as geojson`;
+            const sql = `SELECT ST_AsGeoJson(ST_CollectionExtract(st_MakeValid(ST_GeomFromGeoJSON('${JSON.stringify(geojson)}')),${geometryType})) as geojson`;
 
             if (process.env.NODE_ENV !== 'test' || sql.length < 2000) {
                 logger.debug('SQL to repair geojson: %s', sql);
@@ -164,7 +164,9 @@ class GeoStoreService {
         }
     }
 
+    // @TODO: Extract bbox handeling to its own class
     /**
+     * @name overFlooded
      * @description check if the geometry overflows the [-180, -90, 180, 90] box
      * @param {*} bbox
      * @returns boolean
@@ -174,6 +176,19 @@ class GeoStoreService {
     }
 
     /**
+     * @name bboxToPolygon
+     * @description converts a bbox to a polygon
+     * @param {Array} bbox
+     * @returns {Polygon}
+     */
+    static bboxToPolygon(bbox) {
+        return turf.polygon([[[bbox[2], bbox[3]], [bbox[2], bbox[1]],
+            [bbox[0], bbox[1]], [bbox[0], bbox[3]],
+            [bbox[2], bbox[3]]]]);
+    }
+
+    /**
+     * @name: crossAntiMeridian
      * @description: checks if a bbox crosses the antimeridian
      * this is a mirror of https://github.com/mapbox/carmen/blob/03fac2d7397ecdfcb4f0828fcfd9d8a54c845f21/lib/util/bbox.js#L59
      * @param {Array} bbox A bounding box array in the format [minX, minY, maxX, maxY]
@@ -183,39 +198,54 @@ class GeoStoreService {
     static async crossAntimeridian(feature, bbox) {
         logger.info('Checking antimeridian');
 
-        const antimeridian = this.overFlooded(bbox);
         const geomTypes = ['Point', 'MultiPoint'];
-        if (antimeridian) {
-            logger.debug('BBOX crosses antimeridian but is in [0, 360]');
-            return bbox;
-        }
+        const bboxTotal = bbox || turf.bbox(feature);
         const westHemiBBox = [-180, -90, 0, 90];
         const eastHemiBBox = [0, -90, 180, 90];
-        const bboxTotal = bbox || turf.bbox(feature);
-        logger.info(feature.type);
-        logger.info(feature.geometry.type);
+        const antimeridian = this.overFlooded(bbox);
 
-        if (geomTypes.includes(feature.type) || geomTypes.includes(feature.geometry.type)) {
-            return bbox;
+        if (geomTypes.includes(turf.getType(feature))) {
+        /**
+         * if the geometry is a triangle geometry length is 4 and
+         * the points are spread among hemispheres bbox calc over each
+         * hemisphere will be wrong
+         * This will need its own development
+         */
+            logger.debug('Multipoint or point geometry');
+            return bboxTotal;
         }
 
-        const clippedEastGeom = turf.bboxClip(feature, eastHemiBBox);
-        const clippedWestGeom = turf.bboxClip(feature, westHemiBBox);
+        if (antimeridian) {
+            logger.debug('BBOX crosses antimeridian but is in [0, 360º]');
+            return bboxTotal;
+        }
 
-        const bboxEast = turf.bbox(clippedEastGeom);
-        const bboxWest = turf.bbox(clippedWestGeom);
+        if (turf.booleanIntersects(feature, this.bboxToPolygon(eastHemiBBox))
+                && turf.booleanIntersects(feature, this.bboxToPolygon(westHemiBBox))) {
+            logger.debug('Geometry that is contained in both hemispheres');
 
-        const amBBox = [bboxEast[0], bboxTotal[1], bboxWest[2], bboxTotal[3]];
-        const pmBBox = [bboxWest[0], bboxTotal[1], bboxEast[2], bboxTotal[3]];
+            const clippedEastGeom = turf.bboxClip(feature, eastHemiBBox);
+            const clippedWestGeom = turf.bboxClip(feature, westHemiBBox);
+            const bboxEast = turf.bbox(clippedEastGeom);
+            const bboxWest = turf.bbox(clippedWestGeom);
 
-        const pmBBoxWidth = (bboxEast[2]) + Math.abs(bboxWest[0]);
-        const amBBoxWidth = (180 - bboxEast[0]) + (180 - Math.abs(bboxWest[2]));
-        const newBbox = (pmBBoxWidth > amBBoxWidth) ? amBBox : pmBBox;
+            const amBBox = [bboxEast[0], bboxTotal[1], bboxWest[2], bboxTotal[3]];
+            const pmBBox = [bboxWest[0], bboxTotal[1], bboxEast[2], bboxTotal[3]];
 
-        return newBbox;
+            const pmBBoxWidth = (bboxEast[2]) + Math.abs(bboxWest[0]);
+            const amBBoxWidth = (180 - bboxEast[0]) + (180 - Math.abs(bboxWest[2]));
+
+            const newBbox = (pmBBoxWidth > amBBoxWidth) ? amBBox : pmBBox;
+
+            return newBbox;
+        }
+
+        return bboxTotal;
+
     }
 
     /**
+     * @name: translateBBox
      * @description: This function translates a bbox that crosses the antimeridian
      * @param {Array} bbox
      * @returns {Array} bbox with the antimeridian corrected
@@ -224,11 +254,11 @@ class GeoStoreService {
         logger.debug('Converting bbox from [-180,180] to [0,360] for representation');
         const newBBox = [bbox[0], bbox[1], 360 - Math.abs(bbox[2]), bbox[3]];
         return newBBox;
-
     }
 
     /**
-     * @description: swap a bbox. If a bbox that crosses
+     * @name: swapBBox
+     * @description: swap a bbox. If a bbox crosses
      * the antimeridian will be transformed its
      * latitudes from [-180, 180] to [0, 360]
      * @param {geoStore} geoStore
@@ -241,11 +271,13 @@ class GeoStoreService {
         const bbox = await turf.featureReduce(geoStore.geojson,
             (previousValue, currentFeature) => GeoStoreService.crossAntimeridian(currentFeature, previousValue),
             orgBbox);
+
         return bbox[0] > bbox[2] ? GeoStoreService.translateBBox(bbox) : bbox;
 
     }
 
     /**
+     * @name: calculateBBox
      * @description: Calculates a bbox.
      * If a bbox that crosses the antimeridian will be transformed its
      * latitudes from [-180, 180] to [0, 360]
