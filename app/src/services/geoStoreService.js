@@ -85,7 +85,10 @@ class GeoStoreService {
     static async obtainGeoJSONOfCarto(table, user, filter) {
         logger.debug('Obtaining geojson with params: table %s, user %s, filter %s', table, user, filter);
         logger.debug('Generating query');
-        const sql = `SELECT ST_AsGeoJson(the_geom) as geojson, (ST_Area(geography(the_geom))/10000) as area_ha FROM ${table} WHERE ${filter}`;
+        const sql = `SELECT ST_AsGeoJson(the_geom)                 as geojson,
+                            (ST_Area(geography(the_geom)) / 10000) as area_ha
+                     FROM ${table}
+                     WHERE ${filter}`;
         logger.debug('SQL to obtain geojson: %s', sql);
         const client = new CartoDB.SQL({
             user
@@ -142,13 +145,11 @@ class GeoStoreService {
     }
 
     static async getGeostoreByInfoProps(infoQuery) {
-        const geoStore = await GeoStore.findOne(infoQuery);
-        return geoStore;
+        return GeoStore.findOne(infoQuery);
     }
 
     static async getGeostoreByInfo(info) {
-        const geoStore = await GeoStore.findOne({ info });
-        return geoStore;
+        return GeoStore.findOne({ info });
     }
 
     static async obtainGeoJSON(provider) {
@@ -164,14 +165,14 @@ class GeoStoreService {
         }
     }
 
-    // @TODO: Extract bbox handeling to its own class
+    // @TODO: Extract bbox handling to its own class
     /**
-     * @name overFlooded
+     * @name overflowsAntimeridian
      * @description check if the geometry overflows the [-180, -90, 180, 90] box
      * @param {Array} bbox
      * @returns {boolean}
      */
-    static overFlooded(bbox) {
+    static overflowsAntimeridian(bbox) {
         return bbox[0] > 180 || bbox[2] > 180;
     }
 
@@ -195,33 +196,35 @@ class GeoStoreService {
      * @returns {Array}
      *
      */
-    static async crossAntimeridian(feature, bbox) {
+    static crossAntimeridian(feature, bbox) {
         logger.info('Checking antimeridian');
 
         const geomTypes = ['Point', 'MultiPoint'];
         const bboxTotal = bbox || turf.bbox(feature);
         const westHemiBBox = [-180, -90, 0, 90];
         const eastHemiBBox = [0, -90, 180, 90];
-        const antimeridian = this.overFlooded(bbox);
+        const overflowsAntimeridian = this.overflowsAntimeridian(bbox);
 
         if (geomTypes.includes(turf.getType(feature))) {
-        /**
-         * if the geometry is a triangle geometry length is 4 and
-         * the points are spread among hemispheres bbox calc over each
-         * hemisphere will be wrong
-         * This will need its own development
-         */
+            /**
+             * if the geometry is a triangle geometry length is 4 and
+             * the points are spread among hemispheres bbox calc over each
+             * hemisphere will be wrong
+             * This will need its own development
+             */
             logger.debug('Multipoint or point geometry');
             return bboxTotal;
         }
 
-        if (antimeridian) {
+        if (overflowsAntimeridian) {
             logger.debug('BBOX crosses antimeridian but is in [0, 360º]');
             return bboxTotal;
         }
 
-        if (turf.booleanIntersects(feature, this.bboxToPolygon(eastHemiBBox))
-                && turf.booleanIntersects(feature, this.bboxToPolygon(westHemiBBox))) {
+        if (
+            turf.booleanIntersects(feature, this.bboxToPolygon(eastHemiBBox))
+            && turf.booleanIntersects(feature, this.bboxToPolygon(westHemiBBox))
+        ) {
             logger.debug('Geometry that is contained in both hemispheres');
 
             const clippedEastGeom = turf.bboxClip(feature, eastHemiBBox);
@@ -235,9 +238,7 @@ class GeoStoreService {
             const pmBBoxWidth = (bboxEast[2]) + Math.abs(bboxWest[0]);
             const amBBoxWidth = (180 - bboxEast[0]) + (180 - Math.abs(bboxWest[2]));
 
-            const newBbox = (pmBBoxWidth > amBBoxWidth) ? amBBox : pmBBox;
-
-            return newBbox;
+            return (pmBBoxWidth > amBBoxWidth) ? amBBox : pmBBox;
         }
 
         return bboxTotal;
@@ -252,8 +253,7 @@ class GeoStoreService {
      */
     static translateBBox(bbox) {
         logger.debug('Converting bbox from [-180,180] to [0,360] for representation');
-        const newBBox = [bbox[0], bbox[1], 360 - Math.abs(bbox[2]), bbox[3]];
-        return newBBox;
+        return [bbox[0], bbox[1], 360 - Math.abs(bbox[2]), bbox[3]];
     }
 
     /**
@@ -261,19 +261,19 @@ class GeoStoreService {
      * @description: swap a bbox. If a bbox crosses
      * the antimeridian will be transformed its
      * latitudes from [-180, 180] to [0, 360]
-     * @param {geoStore} geoStore
+     * @param {GeoStore} geoStore
      * @returns {Array}
      *
      * */
-    static async swapBBox(geoStore) {
-
+    static swapBBox(geoStore) {
         const orgBbox = turf.bbox(geoStore.geojson);
-        const bbox = await turf.featureReduce(geoStore.geojson,
+        const bbox = turf.featureReduce(
+            geoStore.geojson,
             (previousValue, currentFeature) => GeoStoreService.crossAntimeridian(currentFeature, previousValue),
-            orgBbox);
+            orgBbox
+        );
 
         return bbox[0] > bbox[2] ? GeoStoreService.translateBBox(bbox) : bbox;
-
     }
 
     /**
@@ -281,13 +281,13 @@ class GeoStoreService {
      * @description: Calculates a bbox.
      * If a bbox that crosses the antimeridian will be transformed its
      * latitudes from [-180, 180] to [0, 360]
-     * @param {geoStore} geoStore
+     * @param {GeoStore} geoStore
      * @returns {geoStore}
      *
      * */
     static async calculateBBox(geoStore) {
         logger.debug('Calculating bbox');
-        geoStore.bbox = await GeoStoreService.swapBBox(geoStore);
+        geoStore.bbox = GeoStoreService.swapBBox(geoStore);
         await geoStore.save();
         return geoStore;
     }
@@ -353,7 +353,7 @@ class GeoStoreService {
         logger.debug('bbox geostore');
         logger.debug('geojson', JSON.stringify(geoStore.bbox));
         if (!geoStore.bbox) {
-            geoStore.bbox = await GeoStoreService.swapBBox(geoStore);
+            geoStore.bbox = GeoStoreService.swapBBox(geoStore);
         }
 
         return GeoStore.findOneAndUpdate({ hash: geoStore.hash }, geoStore, {
@@ -379,8 +379,7 @@ class GeoStoreService {
             geoStore.areaHa = geoJsonObtained.area_ha;
         }
 
-        logger.debug('Converting geojson');
-        logger.debug('Converting', JSON.stringify(geoStore.geojson));
+        logger.debug('Converting geojson', JSON.stringify(geoStore.geojson));
         geoStore.geojson = GeoJSONConverter.makeFeatureCollection(geoStore.geojson);
         logger.debug('Result', JSON.stringify(geoStore.geojson));
         geoStore.areaHa = turf.area(geoStore.geojson) / 10000; // convert to ha2
