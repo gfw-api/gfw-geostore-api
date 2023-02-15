@@ -16,7 +16,7 @@ case "$1" in
         ;;
     start)
         echo "Running Start"
-        exec yarn start
+        exec NODE_EXTRA_CA_CERTS='./certs/SectigoRSADomainValidationSecureServerCA.crt' yarn start
         ;;
     *)
         exec "$@"
