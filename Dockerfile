@@ -16,7 +16,6 @@ RUN cd /opt/$NAME && yarn
 
 COPY entrypoint.sh /opt/$NAME/entrypoint.sh
 COPY config /opt/$NAME/config
-COPY certs /opt/$NAME/certs
 
 WORKDIR /opt/$NAME
 
