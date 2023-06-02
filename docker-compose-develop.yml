@@ -12,7 +12,6 @@ services:
       NODE_ENV: dev
       NODE_PATH: app/src
       API_VERSION: v1
-      CT_REGISTER_MODE: auto
       MONGO_PORT_27017_TCP_ADDR: mongo
       FASTLY_ENABLED: "false"
     command: develop
