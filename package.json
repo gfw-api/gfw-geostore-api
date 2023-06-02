@@ -57,7 +57,7 @@
     "md5": "2.1.0",
     "mongoose": "^5.9.14",
     "mustache": "^2.3.2",
-    "rw-api-microservice-node": "^3.4.1",
+    "rw-api-microservice-node": "^4.0.7",
     "sleep": "^6.1.0"
   },
   "devDependencies": {
