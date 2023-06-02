@@ -95,13 +95,9 @@ async function init() {
             koaValidate(app);
 
             app.use(RWAPIMicroservice.bootstrap({
-                name: config.get('service.name'),
-                info: require('../microservice/register.json'),
-                swagger: require('../microservice/public-swagger.json'),
                 logger,
-                baseURL: process.env.CT_URL,
-                url: process.env.LOCAL_URL,
-                token: process.env.CT_TOKEN,
+                gatewayURL: process.env.GATEWAY_URL,
+                microserviceToken: process.env.MICROSERVICE_TOKEN,
                 fastlyEnabled: process.env.FASTLY_ENABLED,
                 fastlyServiceId: process.env.FASTLY_SERVICEID,
                 fastlyAPIKey: process.env.FASTLY_APIKEY
@@ -117,19 +113,10 @@ async function init() {
             // In production environment, the port must be declared in environment variable
             const port = process.env.PORT || config.get('service.port');
 
-            const server = app.listen(process.env.PORT, () => {
-                if (process.env.CT_REGISTER_MODE === 'auto') {
-                    RWAPIMicroservice.register().then(() => {
-                        logger.info('CT registration process started');
-                        resolve({ app, server });
-                    }, (error) => {
-                        logger.error(error);
-                        process.exit(1);
-                    });
-                }
+            const server = app.listen(port, () => {
             });
-
             logger.info(`Server started in port:${port}`);
+            resolve({ app, server });
         }
 
         logger.info(`Connecting to MongoDB URL ${mongoUri}`);
