@@ -1,13 +1,13 @@
-FROM node:16.18-alpine3.15
+FROM node:20.3-bullseye
 MAINTAINER info@vizzuality.com
 
 ENV NAME gfw-geostore-api
 ENV USER geostore
 
-RUN apk update && apk upgrade && \
-    apk add --no-cache --update bash git openssh python3 alpine-sdk
+RUN apt-get clean && apt-get update -y && apt-get upgrade -y && \
+    apt-get install -y bash git ssh python3 make
 
-RUN addgroup $USER && adduser -s /bin/bash -D -G $USER $USER
+RUN addgroup $USER && useradd -ms /bin/bash $USER -g $USER
 RUN yarn global add bunyan grunt@~1.3
 
 RUN mkdir -p /opt/$NAME

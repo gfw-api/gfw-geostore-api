@@ -5603,10 +5603,15 @@ mv@~2:
     ncp "~2.0.0"
     rimraf "~2.4.0"
 
-nan@^2.0.8, nan@^2.13.2:
+nan@^2.0.8:
   version "2.14.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
   integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
+
+nan@^2.14.1:
+  version "2.17.0"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.17.0.tgz#c0150a2368a182f033e9aa5195ec76ea41a199cb"
+  integrity sha512-2ZTgtl0nJsO0KQCjEpxcIr5D+Yv90plTitZt9JBfQvVJDS5seMl3FOvsh3+9CoYWXf/1l5OaZzzF6nDm4cagaQ==
 
 nanomatch@^1.2.9:
   version "1.2.13"
@@ -7035,12 +7040,12 @@ slash@^3.0.0:
   resolved "https://registry.yarnpkg.com/slash/-/slash-3.0.0.tgz#6539be870c165adbd5240220dbe361f1bc4d4634"
   integrity sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==
 
-sleep@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/sleep/-/sleep-6.1.0.tgz#5507b520556a82ffb983d39123c5459470fa2a9e"
-  integrity sha512-Z1x4JjJxsru75Tqn8F4tnOFeEu3HjtITTsumYUiuz54sGKdISgLCek9AUlXlVVrkhltRFhNUsJDJE76SFHTDIQ==
+sleep@6.3.0:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/sleep/-/sleep-6.3.0.tgz#c524e0e6d8d2e45d3f14e0ba5650fbe45f2ae876"
+  integrity sha512-+WgYl951qdUlb1iS97UvQ01pkauoBK9ML9I/CMPg41v0Ze4EyMlTgFTDDo32iYj98IYqxIjDMRd+L71lawFfpQ==
   dependencies:
-    nan "^2.13.2"
+    nan "^2.14.1"
 
 slice-ansi@0.0.4:
   version "0.0.4"
