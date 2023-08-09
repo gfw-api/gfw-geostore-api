@@ -5,6 +5,7 @@ const GeoStore = require('models/geoStore');
 
 const { createGeostore, getUUID } = require('../utils/utils');
 const { getTestServer } = require('../utils/test-server');
+const { mockValidateRequestWithApiKey } = require('../utils/mock');
 
 chai.should();
 
@@ -30,6 +31,7 @@ describe('Geostore v1 tests - Get multiple geostorea', () => {
     });
 
     it('Get geostores that have been saved to the local database should max of 2 geostores, return a 200', async () => {
+        mockValidateRequestWithApiKey({});
         const createdGeostore1 = await createGeostore({
             areaHa: 205.64210228373287,
             bbox: [],
@@ -52,7 +54,9 @@ describe('Geostore v1 tests - Get multiple geostorea', () => {
             }
         });
 
-        const response = await requester.post(`/api/v1/geostore/find-by-ids`)
+        const response = await requester
+            .post(`/api/v1/geostore/find-by-ids`)
+            .set('x-api-key', 'api-key-test')
             .send({
                 geostores: [createdGeostore1.hash, createdGeostore2.hash, createdGeostore3.hash]
             });
@@ -67,6 +71,7 @@ describe('Geostore v1 tests - Get multiple geostorea', () => {
     });
 
     it('Get geostores some geostores that dont exist return a 200', async () => {
+        mockValidateRequestWithApiKey({});
         const createdGeostore1 = await createGeostore({
             areaHa: 205.64210228373287,
             bbox: [],
@@ -77,7 +82,9 @@ describe('Geostore v1 tests - Get multiple geostorea', () => {
         const randomGeostoreID1 = getUUID();
         const randomGeostoreID2 = getUUID();
 
-        const response = await requester.post(`/api/v1/geostore/find-by-ids`)
+        const response = await requester
+            .post(`/api/v1/geostore/find-by-ids`)
+            .set('x-api-key', 'api-key-test')
             .send({
                 geostores: [createdGeostore1.hash, randomGeostoreID1, randomGeostoreID2]
             });

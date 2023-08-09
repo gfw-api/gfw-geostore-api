@@ -3,14 +3,14 @@ const chai = require('chai');
 const config = require('config');
 const GeoStore = require('models/geoStore');
 
-const { createRequest } = require('../utils/test-server');
+const { getTestServer } = require('../utils/test-server');
 const { DEFAULT_GEOJSON, ANTIMERIDIAN_GEOJSON } = require('../utils/test.constants');
 const { getUUID, ensureCorrectError, createGeostore } = require('../utils/utils');
+const { mockValidateRequestWithApiKey } = require('../utils/mock');
 
 chai.should();
-const prefix = '/api/v1/geostore/';
 
-let geostore;
+let requester;
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
 
@@ -24,20 +24,25 @@ describe('Geostore v1 tests - Get geostores', () => {
             throw Error(`Carto user not set - please specify a CARTODB_USER env var with it.`);
         }
 
-        geostore = await createRequest(prefix, 'get');
+        requester = await getTestServer();
 
         nock.cleanAll();
     });
 
     it('Get geostore that doesn\'t exist should return a 404', async () => {
+        mockValidateRequestWithApiKey({});
         const randomGeostoreID = getUUID();
-        const response = await geostore.get(randomGeostoreID);
+        const response = await requester.get(`/api/v1/geostore/${randomGeostoreID}`)
+            .set('x-api-key', 'api-key-test');
         ensureCorrectError(response, 'GeoStore not found', 404);
     });
 
     it('Getting geostore should return the result (happy case)', async () => {
+        mockValidateRequestWithApiKey({});
         const createdGeostore = await createGeostore();
-        const response = await geostore.get(createdGeostore.hash);
+        const response = await requester
+            .get(`/api/v1/geostore/${createdGeostore.hash}`)
+            .set('x-api-key', 'api-key-test');
 
         response.status.should.equal(200);
         response.body.should.instanceOf(Object).and.have.property('data');
@@ -62,8 +67,11 @@ describe('Geostore v1 tests - Get geostores', () => {
     });
 
     it('Getting a geostore that crosses the antimeridian should give a bbox [position 0 and 2] from [-180, 180] to [0, 360] (happy case)', async () => {
+        mockValidateRequestWithApiKey({});
         const createdGeostore = await createGeostore({}, ANTIMERIDIAN_GEOJSON);
-        const response = await geostore.get(createdGeostore.hash);
+        const response = await requester
+            .get(`/api/v1/geostore/${createdGeostore.hash}`)
+            .set('x-api-key', 'api-key-test');
 
         response.status.should.equal(200);
         response.body.should.instanceOf(Object).and.have.property('data');
@@ -94,8 +102,12 @@ describe('Geostore v1 tests - Get geostores', () => {
     });
 
     it('Getting geostore with format esri should return the result with esrijson (happy case)', async () => {
+        mockValidateRequestWithApiKey({});
         const createdGeostore = await createGeostore();
-        const response = await geostore.get(createdGeostore.hash).query({ format: 'esri' });
+        const response = await requester
+            .get(`/api/v1/geostore/${createdGeostore.hash}`)
+            .query({ format: 'esri' })
+            .set('x-api-key', 'api-key-test');
 
         response.status.should.equal(200);
         response.body.should.instanceOf(Object).and.have.property('data');

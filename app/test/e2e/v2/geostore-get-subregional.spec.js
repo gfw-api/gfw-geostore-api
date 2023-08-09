@@ -8,6 +8,7 @@ const path = require('path');
 
 const { getTestServer } = require('../utils/test-server');
 const { createGeostore } = require('../utils/utils');
+const { mockValidateRequestWithApiKey } = require('../utils/mock');
 
 chai.should();
 
@@ -33,6 +34,7 @@ describe('Geostore v2 tests - Get geostore - SubRegional (admin-2) level', () =>
     });
 
     it('Get subregion that doesn\'t exist should return a 404', async () => {
+        mockValidateRequestWithApiKey({});
         nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
             .get('/api/v2/sql')
             .query({
@@ -55,7 +57,10 @@ describe('Geostore v2 tests - Get geostore - SubRegional (admin-2) level', () =>
                 total_rows: 0
             });
 
-        const response = await requester.get(`/api/v2/geostore/admin/AAA/1/1?simplify=0.005`).send();
+        const response = await requester
+            .get(`/api/v2/geostore/admin/AAA/1/1?simplify=0.005`)
+            .set('x-api-key', 'api-key-test')
+            .send();
 
         response.status.should.equal(404);
         response.body.should.have.property('errors').and.be.an('array');
@@ -64,6 +69,7 @@ describe('Geostore v2 tests - Get geostore - SubRegional (admin-2) level', () =>
     });
 
     it('Get subregion that exists should return a 200', async () => {
+        mockValidateRequestWithApiKey({});
         nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
             .get('/api/v2/sql')
             .query({
@@ -90,7 +96,10 @@ describe('Geostore v2 tests - Get geostore - SubRegional (admin-2) level', () =>
                 total_rows: 1
             });
 
-        const response = await requester.get(`/api/v2/geostore/admin/GBR/1/1?simplify=0.005`).send();
+        const response = await requester
+            .get(`/api/v2/geostore/admin/GBR/1/1?simplify=0.005`)
+            .set('x-api-key', 'api-key-test')
+            .send();
 
         response.status.should.equal(200);
         response.body.should.have.property('data').and.be.an('object');
@@ -113,9 +122,13 @@ describe('Geostore v2 tests - Get geostore - SubRegional (admin-2) level', () =>
     });
 
     it('Get a subregion that has been saved to the local database should return a 200', async () => {
+        mockValidateRequestWithApiKey({});
         await createGeostore(JSON.parse(fs.readFileSync(path.join(__dirname, 'resources', 'GBR-1-1-geom.json'))));
 
-        const response = await requester.get(`/api/v2/geostore/admin/GBR/1/1?simplify=0.005`).send();
+        const response = await requester
+            .get(`/api/v2/geostore/admin/GBR/1/1?simplify=0.005`)
+            .set('x-api-key', 'api-key-test')
+            .send();
 
         response.status.should.equal(200);
         response.body.should.have.property('data').and.be.an('object');

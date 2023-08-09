@@ -4,6 +4,7 @@ const chai = require('chai');
 const config = require('config');
 
 const { getTestServer } = require('../utils/test-server');
+const { mockValidateRequestWithApiKey } = require('../utils/mock');
 
 chai.should();
 
@@ -27,8 +28,10 @@ describe('Geostore v2 tests - Create geostores', () => {
     });
 
     it('Create a geostore an invalid geometry type should fail', async () => {
+        mockValidateRequestWithApiKey({});
         const response = await requester
             .post(`/api/v2/geostore`)
+            .set('x-api-key', 'api-key-test')
             .send({
                 geojson: {
                     type: 'InvalidGeometryType'
@@ -43,6 +46,7 @@ describe('Geostore v2 tests - Create geostores', () => {
     });
 
     it('Create a geostore with points should be successful', async () => {
+        mockValidateRequestWithApiKey({});
         nock(`https://${config.get('cartoDB.user')}.cartodb.com:443`)
             .get('/api/v2/sql')
             .query(
@@ -57,6 +61,7 @@ describe('Geostore v2 tests - Create geostores', () => {
 
         const response = await requester
             .post(`/api/v2/geostore`)
+            .set('x-api-key', 'api-key-test')
             .send({
                 geojson: {
                     type: 'FeatureCollection',
@@ -187,6 +192,7 @@ describe('Geostore v2 tests - Create geostores', () => {
     });
 
     it('Create a geostore providing a provider definition should return a 200 OK response with the created geostore', async () => {
+        mockValidateRequestWithApiKey({});
         nock(`https://wri-01.cartodb.com:443`).get('/api/v2/sql')
             .query(() => true)
             .reply(200, {
@@ -198,6 +204,7 @@ describe('Geostore v2 tests - Create geostores', () => {
 
         const response = await requester
             .post(`/api/v2/geostore`)
+            .set('x-api-key', 'api-key-test')
             .send({
                 provider: {
                     type: 'carto',
@@ -226,6 +233,7 @@ describe('Geostore v2 tests - Create geostores', () => {
     });
 
     it('Create a geostore providing an invalid provider definition should return a 404 Not Found error', async () => {
+        mockValidateRequestWithApiKey({});
         nock(`https://wri-01.cartodb.com:443`).get('/api/v2/sql')
             .query(() => true)
             .reply(404, {
@@ -234,6 +242,7 @@ describe('Geostore v2 tests - Create geostores', () => {
 
         const response = await requester
             .post(`/api/v2/geostore`)
+            .set('x-api-key', 'api-key-test')
             .send({
                 provider: {
                     type: 'carto',

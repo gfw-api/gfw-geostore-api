@@ -3,16 +3,15 @@ const nock = require('nock');
 const chai = require('chai');
 const config = require('config');
 const GeoStore = require('models/geoStore');
-const { createRequest } = require('../utils/test-server');
+const { getTestServer } = require('../utils/test-server');
 const { createGeostore, ensureCorrectError } = require('../utils/utils');
 const { createQueryWDPA } = require('../utils/queries-v2');
-const { createMockQueryCartoDB } = require('../utils/mock');
+const { createMockQueryCartoDB, mockValidateRequestWithApiKey } = require('../utils/mock');
 const { MOCK_RESULT_CARTODB } = require('../utils/test.constants');
 
 chai.should();
 
-const prefix = '/api/v2/geostore/wdpa/';
-let geostoreWDPA;
+let requester;
 
 describe('Geostore v2 tests - Getting geodata by wdpa', () => {
     before(async () => {
@@ -24,20 +23,26 @@ describe('Geostore v2 tests - Getting geodata by wdpa', () => {
         }
 
         nock.cleanAll();
-        geostoreWDPA = await createRequest(prefix, 'get');
+        requester = await getTestServer();
     });
 
     it('Getting geodata by wdpa when data from query wdpa return empty array, and data doens\'t exist into geostore should return not found', async () => {
+        mockValidateRequestWithApiKey({});
         const wdpaid = 123;
         createMockQueryCartoDB({ query: createQueryWDPA(wdpaid), rows: [] });
-        const response = await geostoreWDPA.get(wdpaid);
+        const response = await requester
+            .get(`/api/v2/geostore/wdpa/${wdpaid}`)
+            .set('x-api-key', 'api-key-test');
         ensureCorrectError(response, 'Wdpa not found', 404);
     });
 
     it('Getting geodata by wdpa when data exist into geostore should return the geodata', async () => {
+        mockValidateRequestWithApiKey({});
         const wdpaid = 123;
         const geostore = (await createGeostore({ info: { wdpaid } })).toObject();
-        const response = await geostoreWDPA.get(wdpaid);
+        const response = await requester
+            .get(`/api/v2/geostore/wdpa/${wdpaid}`)
+            .set('x-api-key', 'api-key-test');
         response.status.should.equal(200);
         response.body.should.instanceOf(Object).and.have.property('data');
         response.body.data.should.instanceOf(Object);
@@ -62,9 +67,12 @@ describe('Geostore v2 tests - Getting geodata by wdpa', () => {
     });
 
     it('Getting geodata by wdpa when data doesn\'t exit into geostore but returned by query should create geostore and return the geodata', async () => {
+        mockValidateRequestWithApiKey({});
         const wdpaid = 123;
         createMockQueryCartoDB({ query: createQueryWDPA(wdpaid), rows: MOCK_RESULT_CARTODB });
-        const response = await geostoreWDPA.get(wdpaid);
+        const response = await requester
+            .get(`/api/v2/geostore/wdpa/${wdpaid}`)
+            .set('x-api-key', 'api-key-test');
         const geostore = (await GeoStore.findOne({ info: { wdpaid } })).toObject();
 
         response.status.should.equal(200);
