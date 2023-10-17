@@ -4,16 +4,16 @@ const chai = require('chai');
 const config = require('config');
 const GeoStore = require('models/geoStore');
 
-const { createRequest } = require('../utils/test-server');
+const { getTestServer } = require('../utils/test-server');
 const { ensureCorrectError, createGeostore } = require('../utils/utils');
-const { createMockQueryCartoDB } = require('../utils/mock');
+const { createMockQueryCartoDB, mockValidateRequestWithApiKey } = require('../utils/mock');
 const { createQueryID1AndID2, createQueryGeometry } = require('../utils/queries-v1');
 const { DEFAULT_GEOJSON, MOCK_RESULT_CARTODB } = require('../utils/test.constants');
 
 chai.should();
-const prefix = '/api/v1/geostore/admin';
 
-let subnational;
+let requester;
+
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
 
@@ -28,32 +28,36 @@ describe('Geostore v1 tests - Get geostore sub sub national', () => {
         }
         nock.cleanAll();
 
-        subnational = await createRequest(prefix, 'get');
-
+        requester = await getTestServer();
     });
 
     it('Getting sub sub national from CartoDB with no rows, should return not found', async () => {
+        mockValidateRequestWithApiKey({});
         const testID = 123;
         const testID2 = 123;
         const testISO = 'TEST123';
         createMockQueryCartoDB({ query: createQueryID1AndID2(testID, testID2, testISO) });
 
-        const response = await subnational.get(`/${testISO}/${testID}/${testID2}`);
+        const response = await requester
+            .get(`/api/v1/geostore/admin/${testISO}/${testID}/${testID2}`)
+            .set('x-api-key', 'api-key-test');
         ensureCorrectError(response, 'Country/Admin1/Admin2 not found', 404);
     });
 
     it('Getting sub sub national from CartoDB with no geojson returned should return not found', async () => {
+        mockValidateRequestWithApiKey({});
         const testID = 123;
         const testID2 = 123;
         const testISO = 'TEST123';
         createMockQueryCartoDB({ query: createQueryID1AndID2(testID, testID2, testISO), rows: MOCK_RESULT_CARTODB });
         createMockQueryCartoDB({ query: createQueryGeometry(MOCK_RESULT_CARTODB[0].geojson) });
 
-        const response = await subnational.get(`/${testISO}/${testID}/${testID2}`);
+        const response = await requester.get(`/api/v1/geostore/admin/${testISO}/${testID}/${testID2}`).set('x-api-key', 'api-key-test');
         ensureCorrectError(response, 'No Geojson returned', 404);
     });
 
     it('Getting sub sub national by id should return directly from db when it was created (happy case)', async () => {
+        mockValidateRequestWithApiKey({});
         const testID = 123;
         const testID2 = 123;
         const testISO = 'TEST123';
@@ -63,7 +67,7 @@ describe('Geostore v1 tests - Get geostore sub sub national', () => {
             }
         });
 
-        const response = await subnational.get(`/${testISO}/${testID}/${testID2}`);
+        const response = await requester.get(`/api/v1/geostore/admin/${testISO}/${testID}/${testID2}`).set('x-api-key', 'api-key-test');
 
         const { data } = response.body;
         data.id.should.equal(createdSubnational.hash);
@@ -84,6 +88,7 @@ describe('Geostore v1 tests - Get geostore sub sub national', () => {
     });
 
     it('Getting sub sub national from CartoDB and should be created in db (happy case)', async () => {
+        mockValidateRequestWithApiKey({});
         const testID = 123;
         const testID2 = 123;
         const testISO = 'TEST123';
@@ -93,7 +98,7 @@ describe('Geostore v1 tests - Get geostore sub sub national', () => {
             rows: MOCK_RESULT_CARTODB
         });
 
-        const response = await subnational.get(`/${testISO}/${testID}/${testID2}`);
+        const response = await requester.get(`/api/v1/geostore/admin/${testISO}/${testID}/${testID2}`).set('x-api-key', 'api-key-test');
         response.status.should.equal(200);
         response.body.should.have.property('data');
         response.body.data.should.instanceOf(Object);

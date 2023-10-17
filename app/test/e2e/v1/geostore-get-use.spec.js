@@ -4,23 +4,26 @@ const chai = require('chai');
 const config = require('config');
 const GeoStore = require('models/geoStore');
 
-const { createRequest } = require('../utils/test-server');
+const { getTestServer } = require('../utils/test-server');
 const { createGeostore, ensureCorrectError } = require('../utils/utils');
-const { createMockQueryCartoDB } = require('../utils/mock');
+const { createMockQueryCartoDB, mockValidateRequestWithApiKey } = require('../utils/mock');
 const { createQueryUSE, createQueryGeometry } = require('../utils/queries-v1');
 const { MOCK_RESULT_CARTODB } = require('../utils/test.constants');
 
 chai.should();
-const prefix = '/api/v1/geostore/use';
 
-let geostoreUSE;
+let requester;
+
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
 
 const checkUseRequest = (tableName, actualTableName, useID = 123) => async () => {
+    mockValidateRequestWithApiKey({});
     const providedINFO = { use: { use: actualTableName, id: useID } };
     const geostore = (await createGeostore({ info: providedINFO })).toObject();
-    const response = await geostoreUSE.get(`/${tableName}/${useID}`);
+    const response = await requester
+        .get(`/api/v1/geostore/use/${tableName}/${useID}`)
+        .set('x-api-key', 'api-key-test');
     response.status.should.equal(200);
     response.body.should.have.property('data');
     response.body.data.should.instanceOf(Object);
@@ -45,12 +48,15 @@ const checkUseRequest = (tableName, actualTableName, useID = 123) => async () =>
 };
 
 const checkUseRequestFromQuery = (tableName, actualTableName, useID = 123) => async () => {
+    mockValidateRequestWithApiKey({});
     createMockQueryCartoDB({
         query: createQueryGeometry(MOCK_RESULT_CARTODB[0].geojson),
         rows: MOCK_RESULT_CARTODB
     });
     createMockQueryCartoDB({ query: createQueryUSE(useID, actualTableName), rows: MOCK_RESULT_CARTODB });
-    const response = await geostoreUSE.get(`/${tableName}/${useID}`);
+    const response = await requester
+        .get(`/api/v1/geostore/use/${tableName}/${useID}`)
+        .set('x-api-key', 'api-key-test');
     response.status.should.equal(200);
     response.body.should.have.property('data');
     response.body.data.should.instanceOf(Object);
@@ -77,6 +83,7 @@ const checkUseRequestFromQuery = (tableName, actualTableName, useID = 123) => as
 };
 
 const checkUseRequestFromQueryWithError = (tableName, actualTableName, isGeometryNotFound, useID = 123) => async () => {
+    mockValidateRequestWithApiKey({});
     if (isGeometryNotFound) {
         createMockQueryCartoDB({ query: createQueryGeometry(MOCK_RESULT_CARTODB[0].geojson), rows: [] });
     }
@@ -84,7 +91,9 @@ const checkUseRequestFromQueryWithError = (tableName, actualTableName, isGeometr
         query: createQueryUSE(useID, actualTableName),
         rows: isGeometryNotFound ? MOCK_RESULT_CARTODB : []
     });
-    const response = await geostoreUSE.get(`/${tableName}/${useID}`);
+    const response = await requester
+        .get(`/api/v1/geostore/use/${tableName}/${useID}`)
+        .set('x-api-key', 'api-key-test');
     ensureCorrectError(response, isGeometryNotFound ? 'No Geojson returned' : 'Use not found', 404);
 };
 
@@ -100,7 +109,7 @@ describe('Geostore v1 tests - Get list geostore by use', () => {
 
         nock.cleanAll();
 
-        geostoreUSE = await createRequest(prefix, 'get');
+        requester = await getTestServer();
     });
 
     it('Getting geostore by use table mining with existing geo should return result (happy case)',

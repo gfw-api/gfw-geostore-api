@@ -6,6 +6,7 @@ const GeoStore = require('models/geoStore');
 
 const { createGeostore } = require('../utils/utils');
 const { getTestServer } = require('../utils/test-server');
+const { mockValidateRequestWithApiKey } = require('../utils/mock');
 
 chai.should();
 
@@ -31,6 +32,7 @@ describe('Geostore v1 tests - Get geostore - National level', () => {
     });
 
     it('Get country that doesn\'t exist should return a 404', async () => {
+        mockValidateRequestWithApiKey({});
 
         nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
             .get('/api/v2/sql')
@@ -46,7 +48,10 @@ describe('Geostore v1 tests - Get geostore - National level', () => {
                 total_rows: 0
             });
 
-        const response = await requester.get(`/api/v1/geostore/admin/AAA`).send();
+        const response = await requester
+            .get(`/api/v1/geostore/admin/AAA`)
+            .set('x-api-key', 'api-key-test')
+            .send();
 
         response.status.should.equal(404);
         response.body.should.have.property('errors').and.be.an('array');
@@ -55,6 +60,7 @@ describe('Geostore v1 tests - Get geostore - National level', () => {
     });
 
     it('Get country that exists should return a 200', async () => {
+        mockValidateRequestWithApiKey({});
 
         nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
             .get('/api/v2/sql')
@@ -84,7 +90,10 @@ describe('Geostore v1 tests - Get geostore - National level', () => {
                 total_rows: 1
             });
 
-        const response = await requester.get(`/api/v1/geostore/admin/MCO`).send();
+        const response = await requester
+            .get(`/api/v1/geostore/admin/MCO`)
+            .set('x-api-key', 'api-key-test')
+            .send();
 
         response.status.should.equal(200);
         response.body.should.have.property('data').and.be.an('object');
@@ -104,6 +113,7 @@ describe('Geostore v1 tests - Get geostore - National level', () => {
     });
 
     it('Get country that has been saved to the local database should return a 200', async () => {
+        mockValidateRequestWithApiKey({});
         await createGeostore({
             areaHa: 205.64210228373287,
             bbox: [],
@@ -111,7 +121,10 @@ describe('Geostore v1 tests - Get geostore - National level', () => {
                 iso: 'MCO', id1: null, id2: null, gadm: '2.8'
             }
         });
-        const response = await requester.get(`/api/v1/geostore/admin/MCO`).send();
+        const response = await requester
+            .get(`/api/v1/geostore/admin/MCO`)
+            .set('x-api-key', 'api-key-test')
+            .send();
 
         response.status.should.equal(200);
         response.body.should.have.property('data').and.be.an('object');

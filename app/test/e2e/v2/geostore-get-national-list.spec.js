@@ -3,15 +3,15 @@ const chai = require('chai');
 const config = require('config');
 const GeoStore = require('models/geoStore');
 
-const { createRequest } = require('../utils/test-server');
+const { getTestServer } = require('../utils/test-server');
 const { createGeostore } = require('../utils/utils');
-const { createMockQueryCartoDB } = require('../utils/mock');
+const { createMockQueryCartoDB, mockValidateRequestWithApiKey } = require('../utils/mock');
 const { createQueryISOName } = require('../utils/queries-v2');
 
 chai.should();
-const prefix = '/api/v2/geostore/admin/list';
 
-let listNational;
+let requester;
+
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
 
@@ -27,15 +27,18 @@ describe('Geostore v2 tests - Get list geostore national', () => {
 
         nock.cleanAll();
 
-        listNational = await createRequest(prefix, 'get');
+        requester = await getTestServer();
     });
 
     it('Getting list national geostore should return empty list error (happy case)', async () => {
+        mockValidateRequestWithApiKey({});
         const isoDATA = [{ info: { iso: 'foo' } }, { info: { iso: 'bar' } }];
         const geostores = await Promise.all([createGeostore(isoDATA[0]), createGeostore(isoDATA[1])]);
         createMockQueryCartoDB({ query: createQueryISOName('(\'BAR\', \'FOO\')') });
 
-        const response = await listNational.get();
+        const response = await requester
+            .get('/api/v2/geostore/admin/list')
+            .set('x-api-key', 'api-key-test');
         response.status.should.equal(200);
         response.body.should.have.property('data');
         response.body.data.should.instanceOf(Array);

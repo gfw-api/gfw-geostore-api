@@ -55,9 +55,9 @@ async function init() {
             // instance of koa
             const app = new Koa();
 
-            app.use(koaLogger());
-
             app.use(koaSimpleHealthCheck());
+
+            app.use(koaLogger());
 
             app.use(bodyParser({
                 jsonLimit: '50mb'
@@ -100,22 +100,22 @@ async function init() {
                 microserviceToken: process.env.MICROSERVICE_TOKEN,
                 fastlyEnabled: process.env.FASTLY_ENABLED,
                 fastlyServiceId: process.env.FASTLY_SERVICEID,
-                fastlyAPIKey: process.env.FASTLY_APIKEY
+                fastlyAPIKey: process.env.FASTLY_APIKEY,
+                requireAPIKey: process.env.REQUIRE_API_KEY || true,
+                awsCloudWatchLoggingEnabled: process.env.AWS_CLOUD_WATCH_LOGGING_ENABLED || true,
+                awsRegion: process.env.AWS_REGION,
+                awsCloudWatchLogStreamName: config.get('service.name'),
             }));
 
             // load routes
             loader.loadRoutes(app);
 
-            // Instance of http module
-            // const app = require('http').Server(app.callback());
-
-            // get port of environment, if not exist obtain of the config.
-            // In production environment, the port must be declared in environment variable
             const port = process.env.PORT || config.get('service.port');
 
             const server = app.listen(port, () => {
+                logger.info(`Server started in port:${port}`);
             });
-            logger.info(`Server started in port:${port}`);
+
             resolve({ app, server });
         }
 

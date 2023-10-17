@@ -4,14 +4,14 @@ const config = require('config');
 const fs = require('fs');
 const path = require('path');
 const GeoStore = require('models/geoStore');
-const { createRequest } = require('../utils/test-server');
+const { getTestServer } = require('../utils/test-server');
 const { createGeostore, ensureCorrectError } = require('../utils/utils');
 const { DEFAULT_GEOJSON } = require('../utils/test.constants');
+const { mockValidateRequestWithApiKey } = require('../utils/mock');
 
 chai.should();
 
-const prefix = '/api/v2/geostore';
-let geostoreWDPA;
+let requester;
 
 describe('Geostore v2 tests - Getting geodata by wdpa', () => {
     before(async () => {
@@ -23,18 +23,24 @@ describe('Geostore v2 tests - Getting geodata by wdpa', () => {
         }
 
         nock.cleanAll();
-        geostoreWDPA = await createRequest(prefix, 'get');
+        requester = await getTestServer();
     });
 
     it('Getting geodata by wdpa when data doens\'t exist into geostore should return not found', async () => {
-        const response = await geostoreWDPA.get('/asdsadas/view');
+        mockValidateRequestWithApiKey({});
+        const response = await requester
+            .get('/api/v2/geostore/asdsadas/view')
+            .set('x-api-key', 'api-key-test');
         ensureCorrectError(response, 'GeoStore not found', 404);
     });
 
     it('Getting geodata by wdpa should return result', async () => {
+        mockValidateRequestWithApiKey({});
         const createdGeostore = await createGeostore();
 
-        const response = await geostoreWDPA.get(`/${createdGeostore.hash}/view`);
+        const response = await requester
+            .get(`/api/v2/geostore/${createdGeostore.hash}/view`)
+            .set('x-api-key', 'api-key-test');
 
         response.status.should.equal(200);
         response.body.should.instanceOf(Object).and.have.property('view_link');
@@ -58,9 +64,12 @@ describe('Geostore v2 tests - Getting geodata by wdpa', () => {
     });
 
     it('Geometries larger than 150000 characters (stringified) are not supported by this endpoint and a 400 Bad Request response is returned', async () => {
+        mockValidateRequestWithApiKey({});
         const geojson = JSON.parse(fs.readFileSync(path.join(__dirname, 'resources', 'giant-geom.json')).toString());
         const geostore = await createGeostore({}, geojson);
-        const response = await geostoreWDPA.get(`/${geostore.hash}/view`);
+        const response = await requester
+            .get(`/api/v2/geostore/${geostore.hash}/view`)
+            .set('x-api-key', 'api-key-test');
 
         response.status.should.equal(400);
         response.body.should.have.property('errors').and.have.length(1);

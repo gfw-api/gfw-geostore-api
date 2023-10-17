@@ -16,6 +16,9 @@ services:
       MICROSERVICE_TOKEN: cttoken
       LOCAL_URL: http://geostore.default.svc.cluster.local:3100
       FASTLY_ENABLED: "false"
+      AWS_REGION: "us-east-1"
+      AWS_ACCESS_KEY_ID: "test"
+      AWS_SECRET_ACCESS_KEY: "test"
     command: test
     depends_on:
       - mongo
