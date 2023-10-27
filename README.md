@@ -91,7 +91,6 @@ Follow the instruction above for setting up the runtime environment for Docker e
 - PORT => TCP port in which the service will run
 - NODE_PATH => relative path to the source code. Should be `app/src`
 - MICROSERVICE_TOKEN => 
-- API_VERSION => API version identifier that prefixes the URL. Should be `v1`
 - MONGO_PORT_27017_TCP_ADDR => IP/Address of the MongoDB server
 - CARTODB_USER => [Carto](http://carto.com) username.
 

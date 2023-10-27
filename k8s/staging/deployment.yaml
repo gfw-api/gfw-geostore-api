@@ -60,11 +60,6 @@ spec:
                 secretKeyRef:
                   key: MICROSERVICE_TOKEN
                   name: mssecrets
-            - name: API_VERSION
-              valueFrom:
-                secretKeyRef:
-                  key: API_VERSION
-                  name: mssecrets
             - name: CARTODB_USER
               valueFrom:
                 secretKeyRef:

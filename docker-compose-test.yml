@@ -10,7 +10,6 @@ services:
       CARTODB_USER: test
       NODE_PATH: app/src
       GATEWAY_URL: http://mymachine:9000
-      API_VERSION: v1
       STAMPERY_TOKEN: token
       MONGO_PORT_27017_TCP_ADDR: mongo
       MICROSERVICE_TOKEN: cttoken
