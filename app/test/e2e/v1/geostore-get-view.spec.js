@@ -5,6 +5,7 @@ const GeoStore = require('models/geoStore');
 const { getTestServer } = require('../utils/test-server');
 const { createGeostore, ensureCorrectError } = require('../utils/utils');
 const { DEFAULT_GEOJSON } = require('../utils/test.constants');
+const { mockValidateRequestWithApiKey } = require('../utils/mock');
 
 chai.should();
 
@@ -25,17 +26,22 @@ describe('Geostore v1 tests - Getting geodata by wdpa', () => {
     });
 
     it('Getting geodata by hash when data doesn\'t exist into geostore should return not found', async () => {
+        mockValidateRequestWithApiKey({});
+
         const response = await requester
-            .get(`/api/v1/geostore/asdsadas/view`);
+            .get(`/api/v1/geostore/asdsadas/view`)
+            .set('x-api-key', 'api-key-test');
 
         ensureCorrectError(response, 'GeoStore not found', 404);
     });
 
     it('Getting geodata by hash should return result', async () => {
+        mockValidateRequestWithApiKey({});
         const createdGeostore = await createGeostore();
 
         const response = await requester
-            .get(`/api/v1/geostore/${createdGeostore.hash}/view`);
+            .get(`/api/v1/geostore/${createdGeostore.hash}/view`)
+            .set('x-api-key', 'api-key-test');
 
         response.status.should.equal(200);
         response.body.should.instanceOf(Object).and.have.property('view_link');

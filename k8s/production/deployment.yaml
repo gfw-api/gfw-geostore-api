@@ -61,11 +61,6 @@ spec:
                 secretKeyRef:
                   key: MICROSERVICE_TOKEN
                   name: mssecrets
-            - name: API_VERSION
-              valueFrom:
-                secretKeyRef:
-                  key: API_VERSION
-                  name: mssecrets
             - name: CARTODB_USER
               valueFrom:
                 secretKeyRef:
@@ -88,6 +83,16 @@ spec:
                   key: FASTLY_SERVICEID
                   name: mssecrets
                   optional: true
+            - name: AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  key: AWS_REGION
+                  name: mssecrets
+            - name: REQUIRE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: REQUIRE_API_KEY
+                  name: mssecrets
           image: gfwdockerhub/geostore
           imagePullPolicy: Always
           livenessProbe:

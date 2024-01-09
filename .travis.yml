@@ -2,7 +2,7 @@ language: node_js
 services:
   - mongodb
 node_js:
-  - "20.3"
+  - "20.4"
 cache:
   directories:
   - "node_modules"
@@ -11,13 +11,15 @@ env:
     - CC_TEST_REPORTER_ID=9ca755b76b8f3174bd6988ef719ab4bbc35dfa82de056a6921f8c576a0949829
     - NODE_ENV=test
     - PORT=5037
-    - API_VERSION=v1
     - LOCAL_URL=http://127.0.0.1:3001
     - GATEWAY_URL=http://127.0.0.1:9000
     - MONGO_PORT_27017_TCP_ADDR=127.0.0.1
     - MICROSERVICE_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Im1pY3Jvc2VydmljZSIsImNyZWF0ZWRBdCI6IjIwMTYtMDktMTQifQ.IRCIRm1nfIQTfda_Wb6Pg-341zhV8soAgzw7dd5HxxQ
     - CARTODB_USER=wri-01
     - FASTLY_ENABLED=false
+    - AWS_REGION=us-east-1
+    - AWS_ACCESS_KEY_ID=test
+    - AWS_SECRET_ACCESS_KEY=test
 
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter

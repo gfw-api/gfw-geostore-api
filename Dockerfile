@@ -1,4 +1,4 @@
-FROM node:20.3-bullseye
+FROM node:20.4-bullseye
 MAINTAINER info@vizzuality.com
 
 ENV NAME gfw-geostore-api
